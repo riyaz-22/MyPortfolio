@@ -31,6 +31,9 @@ app.use(
      helmet({
           contentSecurityPolicy: false,
           crossOriginEmbedderPolicy: false,
+          // Allow resources (images/files) to be loaded from other origins
+          // when the frontend is hosted separately (GitHub Pages).
+          crossOriginResourcePolicy: { policy: 'cross-origin' },
      })
 );
 // Configure CORS: allow specific origins and keep credentials support
