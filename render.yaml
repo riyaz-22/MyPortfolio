@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: myportfolio-backend
+    env: node
+    plan: free
+    branch: main
+    rootDirectory: backend
+    startCommand: "npm start"
+    autoDeploy: true
+    pullRequestPreviews: false
