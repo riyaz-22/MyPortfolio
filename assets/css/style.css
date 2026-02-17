@@ -1,8 +1,5 @@
-
-
-
 :root {
-  
+
   --light-bg-primary: #ffffff;
   --light-bg-secondary: #f8f9fa;
   --light-bg-tertiary: #f0f0f0;
@@ -11,7 +8,7 @@
   --light-border: #e0e0e0;
   --light-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  
+
   --dark-bg-primary: #0f0f0f;
   --dark-bg-secondary: #1a1a1a;
   --dark-bg-tertiary: #2a2a2a;
@@ -20,7 +17,7 @@
   --dark-border: #333333;
   --dark-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
-  
+
   --accent-primary: #00d4ff;
   --accent-secondary: #6366f1;
   --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #6366f1 100%);
@@ -28,7 +25,7 @@
   --accent-success: #10b981;
   --accent-error: #ef4444;
 
-  
+
   --ff-heading: 'Space Grotesk', sans-serif;
   --ff-body: 'Inter', sans-serif;
 
@@ -50,7 +47,7 @@
   --fw-semibold: 600;
   --fw-bold: 700;
 
-  
+
   --spacing-xs: 0.5rem;
   --spacing-sm: 0.75rem;
   --spacing-base: 1rem;
@@ -59,7 +56,7 @@
   --spacing-2xl: 3rem;
   --spacing-3xl: 4rem;
 
-  
+
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-base: 8px;
@@ -68,14 +65,14 @@
   --radius-2xl: 20px;
   --radius-full: 9999px;
 
-  
+
   --duration-fast: 150ms;
   --duration-base: 300ms;
   --duration-slow: 500ms;
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
 
-  
+
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-base: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -84,7 +81,7 @@
   --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
   --shadow-glow: 0 0 30px rgba(0, 212, 255, 0.2);
 
-  
+
   --bg-primary: var(--dark-bg-primary);
   --bg-secondary: var(--dark-bg-secondary);
   --bg-tertiary: var(--dark-bg-tertiary);
@@ -92,7 +89,7 @@
   --text-secondary: var(--dark-text-secondary);
   --border-color: var(--dark-border);
 
-  
+
   --z-negative: -1;
   --z-base: 0;
   --z-dropdown: 100;
@@ -346,7 +343,7 @@ main {
 
 .sidebar {
   position: sticky;
-  top: var(--spacing-xl);
+  top: calc(var(--navbar-height) + var(--navbar-gap));
   height: fit-content;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -354,7 +351,7 @@ main {
   padding: var(--spacing-xl);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow-xl);
-  animation: slideInLeft 0.6s var(--ease-out);
+  animation: none;
 }
 
 @keyframes slideInLeft {
@@ -567,6 +564,11 @@ address {
   backdrop-filter: blur(10px);
   padding: var(--spacing-base);
   z-index: var(--z-sticky);
+}
+
+/* Ensure sections scrolled to are offset below the fixed navbar */
+[data-page] {
+  scroll-margin-top: calc(var(--navbar-height) + var(--navbar-gap));
 }
 
 .navbar-list {
@@ -2141,4 +2143,3 @@ textarea.form-input {
     margin-bottom: 2rem;
   }
 }
-
