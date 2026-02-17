@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Super logo">
+  <defs>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#001328" flood-opacity="0.18" />
+    </filter>
+
+    <radialGradient id="highlight" cx="30%" cy="25%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded container with gradient fill -->
+  <rect x="8" y="8" width="184" height="184" rx="36" ry="36" fill="url(#accentGradient)" filter="url(#softShadow)" />
+
+  <!-- subtle inner stroke to match border style -->
+  <rect x="14" y="14" width="172" height="172" rx="30" ry="30" fill="none" stroke-opacity="0.07" stroke="#000" stroke-width="1" />
+
+  <!-- white 'S' mark (stylized) -->
+  <path d="M62 60
+           C62 46 86 44 92 54
+           C98 64 72 72 72 96
+           C72 120 110 120 122 104
+           C134 88 116 72 100 76
+           "
+        fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.98" />
+
+  <!-- small accent stroke to give depth -->
+  <path d="M66 64
+           C66 52 86 50 90 58
+           C94 66 74 72 76 94
+           C78 116 106 116 118 102
+           "
+        fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.18" />
+
+  <!-- highlight overlay -->
+  <rect x="8" y="8" width="184" height="184" rx="36" ry="36" fill="url(#highlight)" />
+
+</svg>
