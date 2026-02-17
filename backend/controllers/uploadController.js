@@ -97,14 +97,14 @@ exports.getFileById = asyncHandler(async (req, res) => {
 
      const downloadStream = bucket.openDownloadStream(_id);
      downloadStream.on('error', () => { res.status(404).json({ success: false, message: 'File not found' }); });
-    
-      // Log download event to analytics (non-blocking)
-      try {
-           const Analytics = require('../models/Analytics');
-           Analytics.create({ type: 'download', ip: req.ip, meta: { fileId: id, fileType: (fileDoc.contentType || '').includes('pdf') ? 'resume' : 'file', filename: fileDoc.filename } }).catch(() => { });
-      } catch (e) { /* ignore */ }
 
-      downloadStream.pipe(res);
+     // Log download event to analytics (non-blocking)
+     try {
+          const Analytics = require('../models/Analytics');
+          Analytics.create({ type: 'download', ip: req.ip, meta: { fileId: id, fileType: (fileDoc.contentType || '').includes('pdf') ? 'resume' : 'file', filename: fileDoc.filename } }).catch(() => { });
+     } catch (e) { /* ignore */ }
+
+     downloadStream.pipe(res);
 });
 
 // ── Delete a file (by id) ───────────────────────────────────────
