@@ -119,7 +119,7 @@ function activatePage(pageElement, pageName) {
 
 const filterSelect = document.querySelector('[data-select]');
 const filterSelectItems = document.querySelectorAll('[data-select-item]');
-const filterSelectValue = document.querySelector('[data-selecct-value]');
+const filterSelectValue = document.querySelector('[data-select-value]');
 const filterBtns = document.querySelectorAll('[data-filter-btn]');
 const projectItems = document.querySelectorAll('[data-filter-item]');
 

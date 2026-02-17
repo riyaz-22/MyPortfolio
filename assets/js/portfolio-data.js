@@ -445,7 +445,7 @@ const PortfolioRenderer = (() => {
           const filterBtns = document.querySelectorAll('[data-filter-btn]');
           const projectItems = document.querySelectorAll('[data-filter-item]');
           const filterSelectItems = document.querySelectorAll('[data-select-item]');
-          const filterSelectValue = document.querySelector('[data-selecct-value]');
+          const filterSelectValue = document.querySelector('[data-select-value]');
 
           filterBtns.forEach(btn => {
                btn.addEventListener('click', () => {
