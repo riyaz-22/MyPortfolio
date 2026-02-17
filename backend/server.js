@@ -1,11 +1,24 @@
 require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+
+// Route imports
 const portfolioRoutes = require('./routes/portfolioRoutes');
+const authRoutes = require('./routes/authRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
+const testimonialRoutes = require('./routes/testimonialRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 // ─── Connect to MongoDB ────────────────────────────────────────
 connectDB();
@@ -14,7 +27,12 @@ connectDB();
 const app = express();
 
 // ─── Global Middleware ─────────────────────────────────────────
-app.use(helmet()); // security headers
+app.use(
+     helmet({
+          contentSecurityPolicy: false,   // admin panel uses inline styles/scripts
+          crossOriginEmbedderPolicy: false,
+     })
+);
 app.use(
      cors({
           origin: process.env.CLIENT_URL || '*',
@@ -39,7 +57,25 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ─── API Routes ────────────────────────────────────────────────
+app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/uploads', uploadRoutes);
+
+// ─── Serve uploaded files ──────────────────────────────────────
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ─── Serve admin panel ─────────────────────────────────────────
+app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
+// SPA-style fallback for /admin sub-routes (e.g. /admin/dashboard)
+app.get('/admin/{*splat}', (_req, res) => {
+     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
+});
+
+// ─── Serve public portfolio assets ─────────────────────────────
+app.use(express.static(path.join(__dirname, '..')));
 
 // ─── 404 handler ───────────────────────────────────────────────
 app.use((req, res) => {

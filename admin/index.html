@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Admin Login | Portfolio</title>
+     <link rel="shortcut icon" href="../assets/images/logo.ico" type="image/x-icon">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="login-body">
+     <div class="login-container">
+          <div class="login-card">
+               <div class="login-header">
+                    <div class="login-logo">
+                         <svg width="48" height="48" viewBox="0 0 40 40" fill="none">
+                              <rect width="40" height="40" rx="10" fill="#6366f1" />
+                              <path d="M12 28V12h5.5c1.5 0 2.7.4 3.6 1.2.9.8 1.4 1.9 1.4 3.3 0 1-.3 1.8-.8 2.5-.5.7-1.2 1.2-2.1 1.4l3.4 7.6h-3l-3-7h-2v7H12zm3-9.5h2.3c.7 0 1.3-.2 1.7-.6.4-.4.6-.9.6-1.6s-.2-1.2-.6-1.6c-.4-.4-1-.6-1.7-.6H15v4.4z"
+                                   fill="#fff" />
+                         </svg>
+                    </div>
+                    <h1>Admin Panel</h1>
+                    <p class="login-subtitle">Sign in to manage your portfolio</p>
+               </div>
+
+               <!-- Alert -->
+               <div id="loginAlert" class="alert hidden"></div>
+
+               <!-- Login form -->
+               <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                         <label for="loginEmail">Email</label>
+                         <input type="email" id="loginEmail" placeholder="admin@example.com" required>
+                    </div>
+                    <div class="form-group">
+                         <label for="loginPassword">Password</label>
+                         <div class="password-wrapper">
+                              <input type="password" id="loginPassword" placeholder="Enter password" required>
+                              <button type="button" class="toggle-password" data-target="loginPassword">
+                                   <svg viewBox="0 0 24 24" width="20" height="20">
+                                        <path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zM12 17c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zm0-8c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3z"
+                                             fill="currentColor" />
+                                   </svg>
+                              </button>
+                         </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                         <span class="btn-text">Sign In</span>
+                         <span class="btn-loader hidden"></span>
+                    </button>
+               </form>
+          </div>
+          <p class="login-footer">Portfolio Admin Panel</p>
+     </div>
+
+     <script src="js/api.js"></script>
+     <script src="js/auth.js"></script>
+</body>
+
+</html>
