@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Dashboard | Portfolio Admin</title>
+     <link rel="shortcut icon" href="../assets/images/logo.ico" type="image/x-icon">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+     <!-- ── Full-page loader shown until JS boots ── -->
+     <div class="page-loader" id="pageLoader">
+          <div class="spinner"></div>
+          <p>Loading dashboard&hellip;</p>
+     </div>
+
+     <!-- ── Sidebar ── -->
+     <aside class="sidebar" id="sidebar">
+          <div class="sidebar-header">
+               <div class="sidebar-logo">
+                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                         <rect width="40" height="40" rx="10" fill="#6366f1" />
+                         <path d="M12 28V12h5.5c1.5 0 2.7.4 3.6 1.2.9.8 1.4 1.9 1.4 3.3 0 1-.3 1.8-.8 2.5-.5.7-1.2 1.2-2.1 1.4l3.4 7.6h-3l-3-7h-2v7H12zm3-9.5h2.3c.7 0 1.3-.2 1.7-.6.4-.4.6-.9.6-1.6s-.2-1.2-.6-1.6c-.4-.4-1-.6-1.7-.6H15v4.4z"
+                              fill="#fff" />
+                    </svg>
+                    <span>Portfolio Admin</span>
+               </div>
+               <button class="sidebar-close" id="sidebarClose">&times;</button>
+          </div>
+
+          <nav class="sidebar-nav">
+               <a href="#" class="nav-item active" data-section="overview">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor" />
+                    </svg>
+                    <span>Dashboard</span>
+               </a>
+               <a href="#" class="nav-item" data-section="profile">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Profile</span>
+               </a>
+               <a href="#" class="nav-item" data-section="skills">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M12 2l-5.5 9h11L12 2zm0 3.8L13.9 9h-3.8L12 5.8zM17.5 13c-2.5 0-4.5 2-4.5 4.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5zm0 7c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Skills</span>
+               </a>
+               <a href="#" class="nav-item" data-section="services">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v2H5zm0-4h14v2H5zm0-4h14v2H5z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Services</span>
+               </a>
+               <a href="#" class="nav-item" data-section="projects">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Portfolio</span>
+               </a>
+               <a href="#" class="nav-item" data-section="experience">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 0h-4V4h4v2z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Experience</span>
+               </a>
+               <a href="#" class="nav-item" data-section="education">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M5 13.2v4L12 21l7-3.8v-4L12 17l-7-3.8zM12 3L1 9l11 6 9-4.9V17h2V9L12 3z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Education</span>
+               </a>
+               <a href="#" class="nav-item" data-section="testimonials">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Testimonials</span>
+               </a>
+               <a href="#" class="nav-item" data-section="resume">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Resume</span>
+               </a>
+               <a href="#" class="nav-item" data-section="contact">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Messages</span>
+                    <span class="badge" id="unreadBadge" style="display:none">0</span>
+               </a>
+               <a href="#" class="nav-item" data-section="settings">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                         <path d="M19.1 12.9a7.8 7.8 0 000-1.8l2-1.6a.5.5 0 00.1-.6l-1.9-3.3a.5.5 0 00-.6-.2l-2.3.9a7 7 0 00-1.6-.9l-.4-2.5a.5.5 0 00-.5-.4h-3.8a.5.5 0 00-.5.4l-.3 2.5a7 7 0 00-1.6.9l-2.3-.9a.5.5 0 00-.6.2L3.8 9a.5.5 0 00.1.6l2 1.6a7.8 7.8 0 000 1.8l-2 1.6a.5.5 0 00-.1.6l1.9 3.3a.5.5 0 00.6.2l2.3-.9a7 7 0 001.6.9l.3 2.5a.5.5 0 00.5.4h3.8a.5.5 0 00.5-.4l.3-2.5a7 7 0 001.6-.9l2.3.9a.5.5 0 00.6-.2l1.9-3.3a.5.5 0 00-.1-.6l-2-1.6zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Settings</span>
+               </a>
+          </nav>
+
+          <div class="sidebar-footer">
+               <div class="sidebar-user" id="sidebarUser">
+                    <div class="sidebar-user-avatar">A</div>
+                    <div class="sidebar-user-info">
+                         <span class="sidebar-user-name" id="sidebarUserName">Admin</span>
+                         <span class="sidebar-user-role">Administrator</span>
+                    </div>
+               </div>
+               <button class="btn btn-logout" id="logoutBtn">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                         <path d="M17 7l-1.4 1.4L18.2 11H8v2h10.2l-2.6 2.6L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                              fill="currentColor" />
+                    </svg>
+                    <span>Logout</span>
+               </button>
+          </div>
+     </aside>
+
+     <!-- ── Main Content ── -->
+     <main class="main-content">
+          <!-- Top bar -->
+          <header class="topbar">
+               <button class="hamburger" id="hamburger">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                         <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor" />
+                    </svg>
+               </button>
+               <h2 class="topbar-title" id="topbarTitle">Dashboard</h2>
+               <div class="topbar-right">
+                    <span class="connection-status" id="connectionStatus" title="Checking connection...">
+                         <span class="status-dot"></span>
+                         <span class="status-text">Checking...</span>
+                    </span>
+                    <span class="user-name" id="userName">Admin</span>
+               </div>
+          </header>
+
+          <!-- Content sections -->
+          <div class="content-area" id="contentArea">
+
+               <!-- ═══ OVERVIEW / DASHBOARD ═══ -->
+               <section class="section active" id="sec-overview">
+                    <div class="stats-grid">
+                         <div class="stat-card">
+                              <div class="stat-icon si-blue">
+                                   <svg viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z"
+                                             fill="currentColor" />
+                                   </svg>
+                              </div>
+                              <div>
+                                   <p class="stat-value" id="statProfile">--</p>
+                                   <p class="stat-label">Profile Status</p>
+                              </div>
+                         </div>
+                         <div class="stat-card">
+                              <div class="stat-icon si-green">
+                                   <svg viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M12 2l-5.5 9h11L12 2z" fill="currentColor" />
+                                   </svg>
+                              </div>
+                              <div>
+                                   <p class="stat-value" id="statSkills">--</p>
+                                   <p class="stat-label">Total Skills</p>
+                              </div>
+                         </div>
+                         <div class="stat-card">
+                              <div class="stat-icon si-purple">
+                                   <svg viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"
+                                             fill="currentColor" />
+                                   </svg>
+                              </div>
+                              <div>
+                                   <p class="stat-value" id="statProjects">--</p>
+                                   <p class="stat-label">Projects</p>
+                              </div>
+                         </div>
+                         <div class="stat-card">
+                              <div class="stat-icon si-orange">
+                                   <svg viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                                             fill="currentColor" />
+                                   </svg>
+                              </div>
+                              <div>
+                                   <p class="stat-value" id="statMessages">--</p>
+                                   <p class="stat-label">Messages</p>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="card mt-4">
+                         <div class="card-header">
+                              <h3>Quick Actions</h3>
+                         </div>
+                         <div class="quick-actions">
+                              <button class="btn btn-outline" onclick="navigateTo('profile')">
+                                   <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                             fill="currentColor" />
+                                   </svg>
+                                   Edit Profile
+                              </button>
+                              <button class="btn btn-outline" onclick="navigateTo('projects')">
+                                   <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" />
+                                   </svg>
+                                   Add Project
+                              </button>
+                              <button class="btn btn-outline" onclick="navigateTo('skills')">
+                                   <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" />
+                                   </svg>
+                                   Add Skill
+                              </button>
+                              <button class="btn btn-outline" onclick="navigateTo('contact')">
+                                   <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                                             fill="currentColor" />
+                                   </svg>
+                                   View Messages
+                              </button>
+                         </div>
+                    </div>
+
+                    <div class="card mt-4" id="overviewActivity">
+                         <div class="card-header">
+                              <h3>System Info</h3>
+                         </div>
+                         <div class="system-info">
+                              <div class="info-row">
+                                   <span class="info-label">API Status</span>
+                                   <span class="info-value" id="apiStatus">Checking...</span>
+                              </div>
+                              <div class="info-row">
+                                   <span class="info-label">Database</span>
+                                   <span class="info-value" id="dbStatus">Checking...</span>
+                              </div>
+                              <div class="info-row">
+                                   <span class="info-label">Server Time</span>
+                                   <span class="info-value" id="serverTime">--</span>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ PROFILE ═══ -->
+               <section class="section" id="sec-profile">
+                    <div class="section-loader" id="profileLoader">
+                         <div class="spinner"></div>
+                         <p>Loading profile...</p>
+                    </div>
+                    <div class="section-error hidden" id="profileError">
+                         <svg viewBox="0 0 24 24" width="48" height="48">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                                   fill="#ef4444" />
+                         </svg>
+                         <p>Failed to load profile data.</p>
+                         <button class="btn btn-outline" onclick="loadProfile()">Retry</button>
+                    </div>
+                    <div class="section-content hidden" id="profileContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Personal Details</h3>
+                              </div>
+                              <form id="profileForm" class="form-grid">
+                                   <div class="form-group"><label>First Name</label><input type="text" name="firstName"
+                                             required></div>
+                                   <div class="form-group"><label>Last Name</label><input type="text" name="lastName"
+                                             required></div>
+                                   <div class="form-group"><label>Title / Role</label><input type="text" name="title"
+                                             required></div>
+                                   <div class="form-group"><label>Email</label><input type="email" name="email"
+                                             required></div>
+                                   <div class="form-group"><label>Phone</label><input type="text" name="phone"></div>
+                                   <div class="form-group"><label>Location</label><input type="text" name="location">
+                                   </div>
+                                   <div class="form-group col-span-2"><label>Bio</label><textarea name="bio" rows="4"
+                                             placeholder="Brief introduction about yourself..."></textarea></div>
+                                   <div class="form-group col-span-2"><label>Profile Image</label>
+                                        <div class="file-upload-area" id="avatarUploadArea">
+                                             <input type="file" id="avatarFile" accept="image/*" class="file-input">
+                                             <p>Drop image here or <span class="text-primary">browse</span></p>
+                                             <small>JPG, PNG, WEBP — Max 10MB</small>
+                                        </div>
+                                        <div class="img-preview" id="avatarPreview"></div>
+                                        <input type="hidden" name="avatar">
+                                   </div>
+                                   <div class="form-group col-span-2">
+                                        <label>Social Links</label>
+                                        <div id="socialLinksContainer"></div>
+                                        <button type="button" class="btn btn-sm btn-outline mt-2" id="addSocialLink">+
+                                             Add Social Link</button>
+                                   </div>
+                                   <div class="form-actions col-span-2">
+                                        <button type="submit" class="btn btn-primary">
+                                             <span class="btn-text">Save Profile</span>
+                                             <span class="btn-loader hidden"></span>
+                                        </button>
+                                        <button type="reset" class="btn btn-outline">Reset</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ SKILLS ═══ -->
+               <section class="section" id="sec-skills">
+                    <div class="section-loader" id="skillsLoader">
+                         <div class="spinner"></div>
+                         <p>Loading skills...</p>
+                    </div>
+                    <div class="section-content hidden" id="skillsContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Skills</h3>
+                                   <button class="btn btn-primary btn-sm" id="addSkillBtn">+ Add Skill</button>
+                              </div>
+                              <div class="empty-state hidden" id="skillsEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M12 2l-5.5 9h11L12 2zm0 3.8L13.9 9h-3.8L12 5.8z" fill="#94a3b8" />
+                                   </svg>
+                                   <p>No skills added yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addSkillBtn').click()">Add your first
+                                        skill</button>
+                              </div>
+                              <div class="table-responsive" id="skillsTableWrap">
+                                   <table class="data-table" id="skillsTable">
+                                        <thead>
+                                             <tr>
+                                                  <th>Name</th>
+                                                  <th>Category</th>
+                                                  <th>Proficiency</th>
+                                                  <th>Actions</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                   </table>
+                              </div>
+                         </div>
+                    </div>
+                    <!-- Skill Modal -->
+                    <div class="modal-overlay" id="skillModal">
+                         <div class="modal">
+                              <div class="modal-header">
+                                   <h3 id="skillModalTitle">Add Skill</h3><button class="modal-close"
+                                        data-close="skillModal">&times;</button>
+                              </div>
+                              <form id="skillForm">
+                                   <input type="hidden" name="skillId">
+                                   <div class="form-group"><label>Skill Name</label><input type="text" name="name"
+                                             required></div>
+                                   <div class="form-group"><label>Category</label>
+                                        <select name="category" required>
+                                             <option value="">Select category</option>
+                                             <option>Frontend</option>
+                                             <option>Backend</option>
+                                             <option>Database</option>
+                                             <option>DevOps</option>
+                                             <option>Mobile</option>
+                                             <option>Tools</option>
+                                             <option>Languages</option>
+                                             <option>Frameworks</option>
+                                             <option>Cloud</option>
+                                             <option>Other</option>
+                                        </select>
+                                   </div>
+                                   <div class="form-group"><label>Proficiency</label>
+                                        <select name="proficiency" required>
+                                             <option value="">Select level</option>
+                                             <option>Beginner</option>
+                                             <option>Intermediate</option>
+                                             <option>Advanced</option>
+                                             <option>Expert</option>
+                                        </select>
+                                   </div>
+                                   <div class="form-group"><label>Icon (optional)</label><input type="text" name="icon"
+                                             placeholder="e.g. icon class or emoji"></div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="skillModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ SERVICES ═══ -->
+               <section class="section" id="sec-services">
+                    <div class="section-loader" id="servicesLoader">
+                         <div class="spinner"></div>
+                         <p>Loading services...</p>
+                    </div>
+                    <div class="section-content hidden" id="servicesContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>What I Do / Services</h3>
+                                   <button class="btn btn-primary btn-sm" id="addServiceBtn">+ Add Service</button>
+                              </div>
+                              <div class="empty-state hidden" id="servicesEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No services added yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addServiceBtn').click()">Add your first
+                                        service</button>
+                              </div>
+                              <div class="items-grid" id="servicesGrid"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="serviceModal">
+                         <div class="modal">
+                              <div class="modal-header">
+                                   <h3 id="serviceModalTitle">Add Service</h3><button class="modal-close"
+                                        data-close="serviceModal">&times;</button>
+                              </div>
+                              <form id="serviceForm">
+                                   <input type="hidden" name="serviceId">
+                                   <div class="form-group"><label>Title</label><input type="text" name="title" required>
+                                   </div>
+                                   <div class="form-group"><label>Description</label><textarea name="description"
+                                             rows="3" required></textarea></div>
+                                   <div class="form-group"><label>Icon (emoji or class)</label><input type="text"
+                                             name="icon" placeholder="e.g. 🚀"></div>
+                                   <div class="form-group"><label>Display Order</label><input type="number" name="order"
+                                             value="0"></div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="serviceModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ PROJECTS ═══ -->
+               <section class="section" id="sec-projects">
+                    <div class="section-loader" id="projectsLoader">
+                         <div class="spinner"></div>
+                         <p>Loading projects...</p>
+                    </div>
+                    <div class="section-content hidden" id="projectsContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Projects / Portfolio</h3>
+                                   <button class="btn btn-primary btn-sm" id="addProjectBtn">+ Add Project</button>
+                              </div>
+                              <div class="empty-state hidden" id="projectsEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No projects added yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addProjectBtn').click()">Add your first
+                                        project</button>
+                              </div>
+                              <div class="items-grid" id="projectsGrid"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="projectModal">
+                         <div class="modal modal-lg">
+                              <div class="modal-header">
+                                   <h3 id="projectModalTitle">Add Project</h3><button class="modal-close"
+                                        data-close="projectModal">&times;</button>
+                              </div>
+                              <form id="projectForm">
+                                   <input type="hidden" name="projectId">
+                                   <div class="form-grid">
+                                        <div class="form-group"><label>Title</label><input type="text" name="title"
+                                                  required></div>
+                                        <div class="form-group"><label>Tech Stack</label><input type="text"
+                                                  name="techStack" placeholder="React, Node.js, MongoDB" required></div>
+                                        <div class="form-group col-span-2"><label>Description</label><textarea
+                                                  name="description" rows="3" required></textarea></div>
+                                        <div class="form-group"><label>GitHub URL</label><input type="url"
+                                                  name="githubUrl"></div>
+                                        <div class="form-group"><label>Live URL</label><input type="url" name="liveUrl">
+                                        </div>
+                                        <div class="form-group col-span-2">
+                                             <label>Project Image</label>
+                                             <div class="file-upload-area" id="projectImageUpload">
+                                                  <input type="file" id="projectImageFile" accept="image/*"
+                                                       class="file-input">
+                                                  <p>Drop image here or <span class="text-primary">browse</span></p>
+                                             </div>
+                                             <div class="img-preview" id="projectImagePreview"></div>
+                                             <input type="hidden" name="images">
+                                        </div>
+                                        <div class="form-group"><label>Display Order</label><input type="number"
+                                                  name="order" value="0"></div>
+                                        <div class="form-group"><label class="checkbox-label"><input type="checkbox"
+                                                       name="featured"> Featured Project</label></div>
+                                   </div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="projectModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ EXPERIENCE ═══ -->
+               <section class="section" id="sec-experience">
+                    <div class="section-loader" id="experienceLoader">
+                         <div class="spinner"></div>
+                         <p>Loading experience...</p>
+                    </div>
+                    <div class="section-content hidden" id="experienceContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Work Experience</h3>
+                                   <button class="btn btn-primary btn-sm" id="addExperienceBtn">+ Add
+                                        Experience</button>
+                              </div>
+                              <div class="empty-state hidden" id="experienceEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No experience added yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addExperienceBtn').click()">Add your first
+                                        experience</button>
+                              </div>
+                              <div class="timeline-list" id="experienceList"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="experienceModal">
+                         <div class="modal modal-lg">
+                              <div class="modal-header">
+                                   <h3 id="experienceModalTitle">Add Experience</h3><button class="modal-close"
+                                        data-close="experienceModal">&times;</button>
+                              </div>
+                              <form id="experienceForm">
+                                   <input type="hidden" name="experienceId">
+                                   <div class="form-grid">
+                                        <div class="form-group"><label>Company</label><input type="text" name="company"
+                                                  required></div>
+                                        <div class="form-group"><label>Role / Position</label><input type="text"
+                                                  name="role" required></div>
+                                        <div class="form-group"><label>Start Date</label><input type="date"
+                                                  name="startDate" required></div>
+                                        <div class="form-group"><label>End Date</label><input type="date"
+                                                  name="endDate"></div>
+                                        <div class="form-group"><label>Location</label><input type="text"
+                                                  name="location"></div>
+                                        <div class="form-group"><label class="checkbox-label"><input type="checkbox"
+                                                       name="current"> Currently Working Here</label></div>
+                                        <div class="form-group col-span-2"><label>Description</label><textarea
+                                                  name="description" rows="3"></textarea></div>
+                                        <div class="form-group col-span-2"><label>Responsibilities (one per
+                                                  line)</label><textarea name="responsibilities" rows="3"
+                                                  placeholder="One responsibility per line"></textarea></div>
+                                   </div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="experienceModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ EDUCATION ═══ -->
+               <section class="section" id="sec-education">
+                    <div class="section-loader" id="educationLoader">
+                         <div class="spinner"></div>
+                         <p>Loading education...</p>
+                    </div>
+                    <div class="section-content hidden" id="educationContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Education</h3>
+                                   <button class="btn btn-primary btn-sm" id="addEducationBtn">+ Add Education</button>
+                              </div>
+                              <div class="empty-state hidden" id="educationEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M5 13.2v4L12 21l7-3.8v-4L12 17l-7-3.8zM12 3L1 9l11 6 9-4.9V17h2V9L12 3z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No education entries yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addEducationBtn').click()">Add your first
+                                        education</button>
+                              </div>
+                              <div class="timeline-list" id="educationList"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="educationModal">
+                         <div class="modal">
+                              <div class="modal-header">
+                                   <h3 id="educationModalTitle">Add Education</h3><button class="modal-close"
+                                        data-close="educationModal">&times;</button>
+                              </div>
+                              <form id="educationForm">
+                                   <input type="hidden" name="educationId">
+                                   <div class="form-group"><label>Institution</label><input type="text"
+                                             name="institution" required></div>
+                                   <div class="form-group"><label>Degree</label><input type="text" name="degree"
+                                             required></div>
+                                   <div class="form-group"><label>Field of Study</label><input type="text" name="field">
+                                   </div>
+                                   <div class="form-grid">
+                                        <div class="form-group"><label>Start Year</label><input type="number"
+                                                  name="startYear" min="1900" max="2100" required></div>
+                                        <div class="form-group"><label>End Year</label><input type="number"
+                                                  name="endYear" min="1900" max="2100"></div>
+                                   </div>
+                                   <div class="form-group"><label>Grade / GPA</label><input type="text" name="grade">
+                                   </div>
+                                   <div class="form-group"><label>Description</label><textarea name="description"
+                                             rows="3"></textarea></div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="educationModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ TESTIMONIALS ═══ -->
+               <section class="section" id="sec-testimonials">
+                    <div class="section-loader" id="testimonialsLoader">
+                         <div class="spinner"></div>
+                         <p>Loading testimonials...</p>
+                    </div>
+                    <div class="section-content hidden" id="testimonialsContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Testimonials</h3>
+                                   <button class="btn btn-primary btn-sm" id="addTestimonialBtn">+ Add
+                                        Testimonial</button>
+                              </div>
+                              <div class="empty-state hidden" id="testimonialsEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No testimonials added yet.</p>
+                                   <button class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('addTestimonialBtn').click()">Add your first
+                                        testimonial</button>
+                              </div>
+                              <div class="items-grid" id="testimonialsGrid"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="testimonialModal">
+                         <div class="modal">
+                              <div class="modal-header">
+                                   <h3 id="testimonialModalTitle">Add Testimonial</h3><button class="modal-close"
+                                        data-close="testimonialModal">&times;</button>
+                              </div>
+                              <form id="testimonialForm">
+                                   <input type="hidden" name="testimonialId">
+                                   <div class="form-group"><label>Name</label><input type="text" name="name" required>
+                                   </div>
+                                   <div class="form-grid">
+                                        <div class="form-group"><label>Role</label><input type="text" name="role"></div>
+                                        <div class="form-group"><label>Company</label><input type="text" name="company">
+                                        </div>
+                                   </div>
+                                   <div class="form-group"><label>Content</label><textarea name="content" rows="4"
+                                             required></textarea></div>
+                                   <div class="form-group"><label>Avatar Photo</label>
+                                        <div class="file-upload-area" id="testimonialAvatarUploadArea">
+                                             <input type="file" id="testimonialAvatarFile" accept="image/*"
+                                                  class="file-input">
+                                             <p>Drop photo or <span class="text-primary">browse</span></p>
+                                        </div>
+                                        <div class="img-preview" id="testimonialAvatarPreview"></div>
+                                        <input type="hidden" name="avatar">
+                                   </div>
+                                   <div class="form-grid">
+                                        <div class="form-group"><label>Rating (1-5)</label><input type="number"
+                                                  name="rating" min="1" max="5" value="5"></div>
+                                        <div class="form-group"><label>Display Order</label><input type="number"
+                                                  name="order" value="0"></div>
+                                   </div>
+                                   <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-outline"
+                                             data-close="testimonialModal">Cancel</button>
+                                   </div>
+                              </form>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ RESUME ═══ -->
+               <section class="section" id="sec-resume">
+                    <div class="section-loader" id="resumeLoader">
+                         <div class="spinner"></div>
+                         <p>Loading resume...</p>
+                    </div>
+                    <div class="section-content hidden" id="resumeContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Resume Management</h3>
+                              </div>
+                              <div class="resume-section">
+                                   <div class="current-resume" id="currentResume">
+                                        <p class="text-secondary">No resume uploaded yet.</p>
+                                   </div>
+                                   <div class="file-upload-area" id="resumeUploadArea">
+                                        <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" class="file-input">
+                                        <svg viewBox="0 0 24 24" width="40" height="40" class="upload-icon">
+                                             <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8v-2zm0-3h8v2H8v-2z"
+                                                  fill="currentColor" />
+                                        </svg>
+                                        <p>Drop your resume here or <span class="text-primary">browse</span></p>
+                                        <small>PDF, DOC, DOCX — Max 10MB</small>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ MESSAGES ═══ -->
+               <section class="section" id="sec-contact">
+                    <div class="section-loader" id="contactLoader">
+                         <div class="spinner"></div>
+                         <p>Loading messages...</p>
+                    </div>
+                    <div class="section-content hidden" id="contactContent">
+                         <div class="card">
+                              <div class="card-header">
+                                   <h3>Contact Submissions</h3>
+                                   <div class="header-actions">
+                                        <input type="text" id="messageSearch" placeholder="Search messages..."
+                                             class="search-input">
+                                        <select id="messageFilter" class="filter-select">
+                                             <option value="">All</option>
+                                             <option value="false">Unread</option>
+                                             <option value="true">Read</option>
+                                        </select>
+                                   </div>
+                              </div>
+                              <div class="empty-state hidden" id="messagesEmpty">
+                                   <svg viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                                             fill="#94a3b8" />
+                                   </svg>
+                                   <p>No messages received yet.</p>
+                              </div>
+                              <div class="messages-list" id="messagesList"></div>
+                              <div class="pagination" id="messagesPagination"></div>
+                         </div>
+                    </div>
+                    <div class="modal-overlay" id="messageModal">
+                         <div class="modal">
+                              <div class="modal-header">
+                                   <h3>Message Details</h3><button class="modal-close"
+                                        data-close="messageModal">&times;</button>
+                              </div>
+                              <div id="messageDetail"></div>
+                         </div>
+                    </div>
+               </section>
+
+               <!-- ═══ SETTINGS ═══ -->
+               <section class="section" id="sec-settings">
+                    <div class="card">
+                         <div class="card-header">
+                              <h3>Change Password</h3>
+                         </div>
+                         <form id="changePasswordForm">
+                              <div class="form-group"><label>Current Password</label><input type="password"
+                                        name="currentPassword" required></div>
+                              <div class="form-group"><label>New Password</label><input type="password"
+                                        name="newPassword" minlength="6" required></div>
+                              <div class="form-group"><label>Confirm New Password</label><input type="password"
+                                        name="confirmPassword" minlength="6" required></div>
+                              <div class="form-actions"><button type="submit" class="btn btn-primary">Change
+                                        Password</button></div>
+                         </form>
+                    </div>
+                    <div class="card mt-4">
+                         <div class="card-header">
+                              <h3>Contact Info (Public)</h3>
+                         </div>
+                         <form id="contactInfoForm" class="form-grid">
+                              <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+                              <div class="form-group"><label>Phone</label><input type="text" name="phone"></div>
+                              <div class="form-group col-span-2"><label>Address</label><input type="text"
+                                        name="location"></div>
+                              <div class="form-actions col-span-2"><button type="submit" class="btn btn-primary">Save
+                                        Contact Info</button></div>
+                         </form>
+                    </div>
+               </section>
+
+          </div>
+     </main>
+
+     <!-- Toast notification -->
+     <div class="toast-container" id="toastContainer"></div>
+
+     <script src="js/api.js"></script>
+     <script src="js/dashboard.js"></script>
+</body>
+
+</html>
