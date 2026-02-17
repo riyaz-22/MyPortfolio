@@ -226,8 +226,11 @@ async function loadUnreadBadge() {
           const u = await Api.unreadCount();
           const badge = $('#unreadBadge');
           const count = u.data?.count || 0;
-          badge.textContent = count;
-          badge.style.display = count > 0 ? '' : 'none';
+          if (badge) {
+               badge.textContent = count;
+               badge.style.display = '';
+               badge.classList.toggle('muted', count === 0);
+          }
      } catch (err) {
           console.warn('[Badge] Failed to load unread count:', err.message);
      }

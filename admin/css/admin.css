@@ -1169,6 +1169,13 @@ a:hover {
      font-weight: 600;
 }
 
+.badge.muted {
+     background: transparent;
+     color: var(--text-sidebar);
+     border: 1px solid rgba(255,255,255,0.06);
+     opacity: 0.9;
+}
+
 .sidebar-footer {
      padding: 1rem 1.25rem;
      border-top: 1px solid var(--bg-sidebar-hover);
