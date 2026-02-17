@@ -2,6 +2,23 @@
 <html lang="en">
 
 <head>
+     <script>
+          (function(){
+               // Project repo folder on GitHub Pages — update if repo name changes
+               const PROJECT_SEGMENT = '/MyPortfolio';
+
+               // Only run on GitHub Pages host
+               if (location.hostname !== 'riyaz-22.github.io') return;
+
+               const p = location.pathname || '/';
+               // If path includes the project segment, rewrite to root-equivalent
+               if (p.startsWith(PROJECT_SEGMENT + '/')) {
+                    const newPath = p.replace(new RegExp('^' + PROJECT_SEGMENT), '');
+                    const target = location.origin + newPath + location.search + location.hash;
+                    if (target !== location.href) location.replace(target);
+               }
+          })();
+     </script>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <title>Dashboard | Portfolio Admin</title>
