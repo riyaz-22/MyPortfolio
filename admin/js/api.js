@@ -10,8 +10,11 @@ const API_BASE = (() => {
      try {
           const m = document.querySelector('meta[name="api-base"]');
           if (m && m.content) {
-               console.log('[API] base (from meta) =', m.content);
-               return m.content;
+               // Normalize: accept either root (https://host) or full API URL (https://host/api)
+               const raw = m.content.replace(/\/+$/, '');
+               const normalized = raw.endsWith('/api') ? raw : `${raw}/api`;
+               console.log('[API] base (from meta) =', normalized);
+               return normalized;
           }
      } catch (e) {
           // document may be undefined in some contexts — ignore

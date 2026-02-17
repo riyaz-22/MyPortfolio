@@ -14,7 +14,14 @@ const PortfolioRenderer = (() => {
      const metaApi = document.querySelector('meta[name="api-base"]')?.getAttribute('content');
      const port = window.location.port;
      const detected = (port === '5000' || port === '') ? '/api' : 'http://localhost:5000/api';
-     const API_BASE = metaApi ? metaApi.replace(/\/+$/, '') : detected; // meta overrides default detection
+     // Normalize meta: allow providing root (https://host) or api path (https://host/api)
+     const API_BASE = (function() {
+          if (metaApi) {
+               const raw = metaApi.replace(/\/+$/, '');
+               return raw.endsWith('/api') ? raw : `${raw}/api`;
+          }
+          return detected;
+     })(); // meta overrides default detection
 
      console.log('[PortfolioData] API base URL:', API_BASE);
 
