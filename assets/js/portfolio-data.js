@@ -52,18 +52,18 @@ const PortfolioRenderer = (() => {
           } catch (e) {
                return url;
           }
+     }
 
-          // Normalize external/social link URLs: ensure scheme exists so hrefs don't become relative
-          function normalizeLinkUrl(url) {
-               if (!url) return url;
-               let u = String(url).trim();
-               // Already has a scheme like 'http:', 'https:', 'mailto:', etc. or protocol-relative
-               if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(u) || u.startsWith('//')) return u;
-               // If it's an absolute path within site, keep as-is
-               if (u.startsWith('/')) return u;
-               // Otherwise assume it's an external host and prepend https://
-               return 'https://' + u.replace(/^\/+/, '');
-          }
+     // Normalize external/social link URLs: ensure scheme exists so hrefs don't become relative
+     function normalizeLinkUrl(url) {
+          if (!url) return url;
+          let u = String(url).trim();
+          // Already has a scheme like 'http:', 'https:', 'mailto:', etc. or protocol-relative
+          if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(u) || u.startsWith('//')) return u;
+          // If it's an absolute path within site, keep as-is
+          if (u.startsWith('/')) return u;
+          // Otherwise assume it's an external host and prepend https://
+          return 'https://' + u.replace(/^\/+/, '');
      }
 
      // ─── HTTP helper with enhanced logging ─────────────────────────

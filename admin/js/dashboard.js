@@ -296,18 +296,18 @@ $('#avatarFile')?.addEventListener('change', async e => {
 function renderSocialLinks(links) {
      const c = $('#socialLinksContainer');
      if (!c) return;
-    if (!links.length) {
-        c.innerHTML = '<p class="text-secondary" style="font-size:.8125rem">No social links added.</p>';
-        return;
-    }
+     if (!links.length) {
+          c.innerHTML = '<p class="text-secondary" style="font-size:.8125rem">No social links added.</p>';
+          return;
+     }
 
-    c.innerHTML = links.map((l, idx) => `
+     c.innerHTML = links.map((l, idx) => `
          <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;">
               <input type="text" value="${l.platform}" style="flex:1" readonly>
               <input type="text" value="${l.url}" style="flex:2" readonly>
               <div style="display:flex;flex-direction:column;gap:.25rem;margin-left:.25rem">
-                   <button type="button" class="btn btn-sm" title="Move up" onclick="moveSocialLink('${l._id}','up')" ${idx===0? 'disabled' : ''}>↑</button>
-                   <button type="button" class="btn btn-sm" title="Move down" onclick="moveSocialLink('${l._id}','down')" ${idx===links.length-1? 'disabled' : ''}>↓</button>
+                   <button type="button" class="btn btn-sm" title="Move up" onclick="moveSocialLink('${l._id}','up')" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                   <button type="button" class="btn btn-sm" title="Move down" onclick="moveSocialLink('${l._id}','down')" ${idx === links.length - 1 ? 'disabled' : ''}>↓</button>
               </div>
               <button type="button" class="btn btn-danger btn-sm" style="margin-left:.5rem" onclick="removeSocialLink('${l._id}')">×</button>
          </div>
