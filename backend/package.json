@@ -15,7 +15,6 @@
   ],
   "author": "Riyaz Ahmad J",
   "license": "ISC",
-  "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
