@@ -26,6 +26,33 @@ connectDB();
 // Create Express app
 const app = express();
 
+// Defensive preflight/CORS middleware (runs before helmet and cors)
+// This ensures OPTIONS preflight responses always include basic CORS headers
+app.use((req, res, next) => {
+     const allowed = [
+          'https://riyaz-22.github.io',
+          'https://my-portfolio-seven-iota-38.vercel.app',
+     ];
+     if (process.env.CLIENT_URL) {
+          try {
+               allowed.push(new URL(process.env.CLIENT_URL).origin);
+          } catch (e) {
+               allowed.push(process.env.CLIENT_URL.replace(/\/+$/, ''));
+          }
+     }
+
+     const origin = req.headers.origin;
+     if (origin && allowed.includes(origin)) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+          res.setHeader('Access-Control-Allow-Credentials', 'true');
+          res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+     }
+
+     if (req.method === 'OPTIONS') return res.sendStatus(204);
+     next();
+});
+
 // Middleware
 app.use(
      helmet({
