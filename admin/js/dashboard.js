@@ -219,6 +219,47 @@ async function loadOverview() {
           console.warn('[Overview] Failed to fetch message count:', err.message);
           $('#statMessages').textContent = '?';
      }
+
+         // Fetch analytics summary and append KPI cards
+         try {
+              const a = await Api.getAnalyticsSummary();
+              const s = a.data || {};
+              const grid = document.querySelector('.stats-grid');
+              if (grid) {
+                   const extra = document.createElement('div');
+                   extra.className = 'stat-card';
+                   extra.innerHTML = `
+                        <div class="stat-icon si-blue"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/></svg></div>
+                        <div>
+                             <p class="stat-value">${s.totalVisits ?? 0}</p>
+                             <p class="stat-label">Total Visits</p>
+                        </div>
+                   `;
+                   grid.appendChild(extra);
+
+                   const vcard = document.createElement('div');
+                   vcard.className = 'stat-card';
+                   vcard.innerHTML = `
+                        <div class="stat-icon si-green"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2l-5.5 9h11L12 2z" fill="currentColor"/></svg></div>
+                        <div>
+                             <p class="stat-value">${s.uniqueVisitors ?? 0}</p>
+                             <p class="stat-label">Unique Visitors</p>
+                        </div>
+                   `;
+                   grid.appendChild(vcard);
+
+                   const rd = document.createElement('div');
+                   rd.className = 'stat-card';
+                   rd.innerHTML = `
+                        <div class="stat-icon si-purple"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" fill="currentColor"/></svg></div>
+                        <div>
+                             <p class="stat-value">${s.resumeDownloads ?? 0}</p>
+                             <p class="stat-label">Resume Downloads</p>
+                        </div>
+                   `;
+                   grid.appendChild(rd);
+              }
+         } catch (e) { console.warn('[Overview] Analytics fetch failed:', e.message); }
 }
 
 async function loadUnreadBadge() {

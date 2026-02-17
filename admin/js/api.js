@@ -162,6 +162,9 @@ const Api = {
           return this.request('/uploads/single', { method: 'POST', body: fd });
      },
      deleteUpload(idOrName) { return this.request(`/uploads/${idOrName}`, { method: 'DELETE' }); },
+         /* ── Analytics ── */
+         getAnalyticsSummary() { return this.request('/analytics/summary'); },
+         getAnalyticsVisits(days) { return this.request(`/analytics/visits?days=${days || 30}`); },
 
      /* ── Health check ── */
      healthCheck() { return this.request('/health'); },

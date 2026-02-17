@@ -15,6 +15,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 // Ensure uploads directory exists (used for local dev fallback)
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -112,6 +113,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Serve uploaded files (local fallback) - GridFS route will handle streamed files in controller
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
