@@ -82,7 +82,7 @@ function navigateTo(section) {
      const titles = {
           overview: 'Dashboard', profile: 'Profile', skills: 'Skills',
           services: 'Services', projects: 'Portfolio', experience: 'Experience',
-          education: 'Education', testimonials: 'Testimonials', resume: 'Resume',
+          education: 'Education', testimonials: 'Testimonials',
           contact: 'Messages', settings: 'Settings',
      };
      $('#topbarTitle').textContent = titles[section] || section;
@@ -90,7 +90,7 @@ function navigateTo(section) {
      const loaders = {
           overview: loadOverview, profile: loadProfile, skills: loadSkills,
           services: loadServices, projects: loadProjects, experience: loadExperience,
-          education: loadEducation, testimonials: loadTestimonials, resume: loadResume,
+          education: loadEducation, testimonials: loadTestimonials,
           contact: loadMessages,
      };
      if (loaders[section]) loaders[section]();
@@ -248,16 +248,7 @@ async function loadOverview() {
                    `;
                grid.appendChild(vcard);
 
-               const rd = document.createElement('div');
-               rd.className = 'stat-card';
-               rd.innerHTML = `
-                        <div class="stat-icon si-purple"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" fill="currentColor"/></svg></div>
-                        <div>
-                             <p class="stat-value">${s.resumeDownloads ?? 0}</p>
-                             <p class="stat-label">Resume Downloads</p>
-                        </div>
-                   `;
-               grid.appendChild(rd);
+
           }
      } catch (e) { console.warn('[Overview] Analytics fetch failed:', e.message); }
 }
@@ -1041,56 +1032,7 @@ $('#testimonialForm')?.addEventListener('submit', async e => {
      } catch (err) { toast(err.message, 'error'); }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  RESUME
-// ═══════════════════════════════════════════════════════════════
-function loadResume() {
-     console.log('[Resume] Loading...');
-     hide($('#resumeLoader'));
-     show($('#resumeContent'));
 
-     const r = portfolio?.resume || {};
-     const container = $('#currentResume');
-     if (r.fileUrl) {
-          const date = r.lastUpdated ? new Date(r.lastUpdated).toLocaleDateString() : 'N/A';
-          container.innerHTML = `
-               <div class="resume-info">
-                    <svg viewBox="0 0 24 24" width="32" height="32" style="color:var(--primary)"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" fill="currentColor"/></svg>
-                    <div>
-                         <a href="${resolveUrl(r.fileUrl)}" target="_blank">${r.fileUrl.split('/').pop()}</a>
-                         <p class="text-secondary" style="font-size:.75rem">Last updated: ${date}</p>
-                    </div>
-                    <button class="btn btn-danger btn-sm" onclick="removeResume()">Remove</button>
-               </div>
-          `;
-     } else {
-          container.innerHTML = '<p class="text-secondary">No resume uploaded yet. Use the area below to upload one.</p>';
-     }
-}
-
-$('#resumeFile')?.addEventListener('change', async e => {
-     const file = e.target.files[0];
-     if (!file) return;
-     try {
-          console.log('[Resume] Uploading...');
-          const res = await Api.uploadFile(file);
-          const fileUrl = res.data.fileUrl;
-          await Api.updateSection('resume', { fileUrl, lastUpdated: new Date().toISOString() });
-          portfolio.resume = { fileUrl, lastUpdated: new Date().toISOString() };
-          loadResume();
-          toast('Resume uploaded successfully');
-     } catch (err) { toast(err.message, 'error'); }
-});
-
-window.removeResume = async () => {
-     if (!confirm('Remove the current resume?')) return;
-     try {
-          await Api.updateSection('resume', { fileUrl: '', lastUpdated: new Date().toISOString() });
-          portfolio.resume = { fileUrl: '', lastUpdated: new Date().toISOString() };
-          loadResume();
-          toast('Resume removed');
-     } catch (err) { toast(err.message, 'error'); }
-};
 
 // ═══════════════════════════════════════════════════════════════
 //  MESSAGES

@@ -16,8 +16,7 @@ exports.getSummary = asyncHandler(async (req, res) => {
      const educationCount = (portfolio?.education || []).length;
      const servicesCount = await require('../models/Service').countDocuments();
 
-     const resumeDownloads = await Analytics.countDocuments({ type: 'download', 'meta.fileType': 'resume' });
-     const resumeViews = await Analytics.countDocuments({ type: 'resume_view' });
+     // resume download/view metrics removed
 
      const totalMessages = await Contact.countDocuments();
      const unreadMessages = await Contact.countDocuments({ isRead: false });
@@ -38,8 +37,7 @@ exports.getSummary = asyncHandler(async (req, res) => {
                experienceCount,
                educationCount,
                servicesCount,
-               resumeDownloads,
-               resumeViews,
+
                totalMessages,
                unreadMessages,
                lastPortfolioUpdate,

@@ -233,13 +233,14 @@ const PortfolioRenderer = (() => {
                heroTitle.innerHTML = `<span class="text-gradient">${pd.title.split(' ')[0]}</span> ${pd.title.split(' ').slice(1).join(' ') || ''}`;
           }
 
-          // Resume download link
+          // Remove resume download behavior (disable download link)
           if (resume?.fileUrl) {
                const resumeBtn = document.querySelector('.hero-cta .btn-secondary');
                if (resumeBtn) {
-                    resumeBtn.href = resolveUrl(resume.fileUrl);
-                    resumeBtn.setAttribute('download', '');
-                    resumeBtn.setAttribute('target', '_blank');
+                    resumeBtn.removeAttribute('href');
+                    resumeBtn.removeAttribute('download');
+                    resumeBtn.removeAttribute('target');
+                    resumeBtn.style.display = 'none';
                }
           }
      }

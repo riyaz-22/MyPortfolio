@@ -91,18 +91,12 @@ exports.getFileById = asyncHandler(async (req, res) => {
      if (fileDoc.contentType) res.setHeader('Content-Type', fileDoc.contentType);
      else res.setHeader('Content-Type', 'application/octet-stream');
 
-     // Force download using original filename
-     const safeName = fileDoc.filename ? fileDoc.filename.replace(/"/g, '') : id;
-     res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`);
+     // Do not force download; let browser handle rendering based on Content-Type
 
      const downloadStream = bucket.openDownloadStream(_id);
      downloadStream.on('error', () => { res.status(404).json({ success: false, message: 'File not found' }); });
 
-     // Log download event to analytics (non-blocking)
-     try {
-          const Analytics = require('../models/Analytics');
-          Analytics.create({ type: 'download', ip: req.ip, meta: { fileId: id, fileType: (fileDoc.contentType || '').includes('pdf') ? 'resume' : 'file', filename: fileDoc.filename } }).catch(() => { });
-     } catch (e) { /* ignore */ }
+     // Removed download analytics logging for resume/file downloads
 
      downloadStream.pipe(res);
 });
