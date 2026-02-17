@@ -25,6 +25,22 @@ const PortfolioRenderer = (() => {
 
      console.log('[PortfolioData] API base URL:', API_BASE);
 
+     // Auto-detect site base for GitHub Pages project sites (e.g. /MyPortfolio)
+     const SITE_BASE = (function () {
+          try {
+               const p = window.location.pathname.replace(/\/+$/g, '');
+               const parts = p.split('/');
+               // When served from a project page the pathname is like '/RepoName/...'
+               if (parts.length > 2 && parts[1]) return '/' + parts[1];
+          } catch (e) {
+               // fallback to root
+          }
+          return '';
+     })();
+     // Expose for other scripts that may need it
+     window.SITE_BASE = SITE_BASE;
+     const ADMIN_URL = SITE_BASE + '/admin';
+
      // Resolve DB-stored '/api/...' paths to absolute URLs when needed
      function resolveUrl(url) {
           if (!url) return url;
@@ -716,7 +732,7 @@ const PortfolioRenderer = (() => {
 
           if (!portfolio) {
                console.warn('[PortfolioData] ⚠ No portfolio found in MongoDB');
-               console.log('[PortfolioData] Admin URL: /admin');
+               console.log('[PortfolioData] Admin URL:', ADMIN_URL);
                // Show a message in the hero section
                const heroTitle = document.querySelector('.hero-title');
                if (heroTitle) heroTitle.innerHTML = 'Welcome to <span class="text-gradient">My</span> Portfolio';
