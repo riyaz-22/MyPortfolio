@@ -378,8 +378,8 @@ main {
 }
 
 .avatar-box {
-  width: 120px;
-  height: 120px;
+  width: 100%;
+  height: auto;
   background: var(--accent-gradient);
   border-radius: var(--radius-2xl);
   padding: 3px;
