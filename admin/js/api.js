@@ -17,6 +17,15 @@ const API_BASE = (() => {
           // document may be undefined in some contexts — ignore
      }
 
+     // If served from GitHub Pages, use the deployed backend (avoid routing to github.io/api)
+     try {
+          if (location.hostname && location.hostname.includes('github.io')) {
+               const fallback = 'https://my-portfolio-seven-iota-38.vercel.app/api';
+               console.warn('[API] Running on GitHub Pages — forcing API base to', fallback);
+               return fallback;
+          }
+     } catch (e) {}
+
      const host = location.hostname;
      const port = location.port;
 
