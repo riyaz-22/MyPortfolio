@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
      // If already logged in, redirect to dashboard
      if (Api.getToken()) {
-          console.log('[Auth] Token found — redirecting to dashboard');
-          window.location.href = '/admin/dashboard.html';
+               console.log('[Auth] Token found — redirecting to dashboard');
+               window.location.href = './dashboard.html';
           return;
      }
 
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                Api.setToken(data.token);
                Api.setUser(data.user);
                console.log('[Auth] Login successful — redirecting');
-               window.location.href = '/admin/dashboard.html';
+               window.location.href = './dashboard.html';
           } catch (err) {
                console.error('[Auth] Login failed:', err.message);
                showAlert(err.message, 'error');
