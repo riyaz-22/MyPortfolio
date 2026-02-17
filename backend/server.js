@@ -88,12 +88,14 @@ app.use((req, res) => {
 // ─── Global Error Handler ──────────────────────────────────────
 app.use(errorHandler);
 
-// ─── Start Server ──────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-     console.log(
-          `🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
-     );
-});
+// ─── Start Server (only when running directly) ──────────────────
+const app = require('./app');
+
+if (require.main === module) {
+     const PORT = process.env.PORT || 5000;
+     app.listen(PORT, () => {
+          console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+     });
+}
 
 module.exports = app;

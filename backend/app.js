@@ -28,17 +28,17 @@ const app = express();
 
 // Middleware
 app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  })
+     helmet({
+          contentSecurityPolicy: false,
+          crossOriginEmbedderPolicy: false,
+     })
 );
 app.use(
-  cors({
-    origin: process.env.CLIENT_URL || '*',
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-    credentials: true,
-  })
+     cors({
+          origin: process.env.CLIENT_URL || '*',
+          methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+          credentials: true,
+     })
 );
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Health-check
 app.get('/api/health', (_req, res) => {
-  res.json({ success: true, message: 'Portfolio API is running', timestamp: new Date().toISOString() });
+     res.json({ success: true, message: 'Portfolio API is running', timestamp: new Date().toISOString() });
 });
 
 // API routes
@@ -69,7 +69,7 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+     res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
 });
 
 // Error handler
