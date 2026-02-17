@@ -2,10 +2,21 @@
    API Helper — shared between login & dashboard pages
    ═══════════════════════════════════════════════════════════════ */
 
-// Resolve API base - prefer relative '/api' when served by the backend (port 5000).
-// If the admin files are opened from another origin (e.g. Live Server on :5500),
-// point requests to the backend at http://localhost:5000 to avoid 405 errors.
+// Resolve API base - prefer an explicit meta tag, then relative '/api' when served by the backend (port 5000).
+// If the admin files are opened from another origin (e.g. Live Server or GitHub Pages),
+// an `api-base` meta tag can force requests to the deployed backend URL.
 const API_BASE = (() => {
+     // Prefer explicit meta tag (allows admin to be hosted separately)
+     try {
+          const m = document.querySelector('meta[name="api-base"]');
+          if (m && m.content) {
+               console.log('[API] base (from meta) =', m.content);
+               return m.content;
+          }
+     } catch (e) {
+          // document may be undefined in some contexts — ignore
+     }
+
      const host = location.hostname;
      const port = location.port;
 
