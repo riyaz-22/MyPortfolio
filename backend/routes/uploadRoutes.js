@@ -6,6 +6,9 @@ const { protect } = require('../middleware/auth');
 
 router.post('/single', protect, upload.single('file'), ctrl.uploadFile);
 router.post('/multiple', protect, upload.array('files', 10), ctrl.uploadMultiple);
+// Public file retrieval (streams from GridFS)
+router.get('/file/:id', ctrl.getFileById);
+// Delete by id or filename (protected)
 router.delete('/:filename', protect, ctrl.deleteFile);
 
 module.exports = router;

@@ -138,7 +138,7 @@ const Api = {
           fd.append(fieldName, file);
           return this.request('/uploads/single', { method: 'POST', body: fd });
      },
-     deleteUpload(filename) { return this.request(`/uploads/${filename}`, { method: 'DELETE' }); },
+     deleteUpload(idOrName) { return this.request(`/uploads/${idOrName}`, { method: 'DELETE' }); },
 
      /* ── Health check ── */
      healthCheck() { return this.request('/health'); },

@@ -10,11 +10,11 @@
 
 const PortfolioRenderer = (() => {
      // Auto detect API base (same logic as admin/js/api.js)
+     // Allow explicit override via <meta name="api-base" content="https://api.example.com"> in `index.html`.
+     const metaApi = document.querySelector('meta[name="api-base"]')?.getAttribute('content');
      const port = window.location.port;
-     const API_BASE =
-          port === '5000' || port === ''
-               ? '/api'
-               : 'http://localhost:5000/api';
+     const detected = (port === '5000' || port === '') ? '/api' : 'http://localhost:5000/api';
+     const API_BASE = metaApi ? metaApi.replace(/\/+$/, '') : detected; // meta overrides default detection
 
      console.log('[PortfolioData] API base URL:', API_BASE);
 
