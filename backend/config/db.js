@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
-// Prevent queries from silently buffering when there's no DB connection
-mongoose.set('bufferCommands', false);
+// Allow queries to buffer until the initial DB connection is established
+// (prevents "Cannot call users.findOne() before initial connection is complete" errors)
+mongoose.set('bufferCommands', true);
 
 const connectDB = async () => {
      if (!process.env.MONGODB_URI) {
