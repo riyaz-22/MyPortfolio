@@ -33,13 +33,45 @@ app.use(
           crossOriginEmbedderPolicy: false,
      })
 );
-app.use(
-     cors({
-          origin: process.env.CLIENT_URL || '*',
-          methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-          credentials: true,
-     })
-);
+// Configure CORS: allow specific origins and keep credentials support
+{
+     const allowedOrigins = new Set();
+     // Add common origins we expect
+     allowedOrigins.add('https://riyaz-22.github.io');
+     allowedOrigins.add('https://my-portfolio-seven-iota-38.vercel.app');
+
+     // If CLIENT_URL is provided (may include path), try to normalize to origin
+     if (process.env.CLIENT_URL) {
+          try {
+               const u = new URL(process.env.CLIENT_URL);
+               allowedOrigins.add(u.origin);
+          } catch (e) {
+               // Fallback: strip trailing slash if present
+               allowedOrigins.add(process.env.CLIENT_URL.replace(/\/+$/, ''));
+          }
+     }
+
+     app.use(
+          cors({
+               origin: (origin, callback) => {
+                    // Allow requests with no origin (e.g., server-to-server, curl)
+                    if (!origin) return callback(null, true);
+                    // Normalize incoming origin (should already be origin-only)
+                    const incoming = (() => {
+                         try {
+                              return new URL(origin).origin;
+                         } catch (e) {
+                              return origin;
+                         }
+                    })();
+                    if (allowedOrigins.has(incoming)) return callback(null, true);
+                    return callback(new Error('CORS policy: origin not allowed'), false);
+               },
+               methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+               credentials: true,
+          })
+     );
+}
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
