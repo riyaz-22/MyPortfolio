@@ -7,9 +7,13 @@ const connectDB = async () => {
      }
 
      try {
-          const conn = await mongoose.connect(process.env.MONGODB_URI, {
+          const connectOpts = {
                serverSelectionTimeoutMS: 5000,
-          });
+          };
+          // If a specific DB name is provided, prefer it to avoid defaulting to 'test'
+          if (process.env.DB_NAME) connectOpts.dbName = process.env.DB_NAME;
+
+          const conn = await mongoose.connect(process.env.MONGODB_URI, connectOpts);
           console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
      } catch (error) {
           // Log error but do NOT exit the process — serverless platforms must not call process.exit
