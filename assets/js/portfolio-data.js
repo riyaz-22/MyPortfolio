@@ -237,8 +237,9 @@ const PortfolioRenderer = (() => {
           if (resume?.fileUrl) {
                const resumeBtn = document.querySelector('.hero-cta .btn-secondary');
                if (resumeBtn) {
-                    resumeBtn.href = resume.fileUrl;
+                    resumeBtn.href = resolveUrl(resume.fileUrl);
                     resumeBtn.setAttribute('download', '');
+                    resumeBtn.setAttribute('target', '_blank');
                }
           }
      }

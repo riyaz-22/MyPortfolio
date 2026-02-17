@@ -82,6 +82,19 @@ exports.getFileById = asyncHandler(async (req, res) => {
      let _id;
      try { _id = new mongoose.Types.ObjectId(id); } catch (err) { throw new ApiError(400, 'Invalid file id'); }
 
+     // Look up file metadata so we can set proper headers (content-type, disposition)
+     const filesColl = db.collection('uploads.files');
+     const fileDoc = await filesColl.findOne({ _id });
+     if (!fileDoc) throw new ApiError(404, 'File not found');
+
+     // Set Content-Type if available
+     if (fileDoc.contentType) res.setHeader('Content-Type', fileDoc.contentType);
+     else res.setHeader('Content-Type', 'application/octet-stream');
+
+     // Force download using original filename
+     const safeName = fileDoc.filename ? fileDoc.filename.replace(/"/g, '') : id;
+     res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`);
+
      const downloadStream = bucket.openDownloadStream(_id);
      downloadStream.on('error', () => { res.status(404).json({ success: false, message: 'File not found' }); });
      downloadStream.pipe(res);

@@ -1010,13 +1010,13 @@ function loadResume() {
 
      const r = portfolio?.resume || {};
      const container = $('#currentResume');
-     if (r.fileUrl) {
+         if (r.fileUrl) {
           const date = r.lastUpdated ? new Date(r.lastUpdated).toLocaleDateString() : 'N/A';
           container.innerHTML = `
                <div class="resume-info">
                     <svg viewBox="0 0 24 24" width="32" height="32" style="color:var(--primary)"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" fill="currentColor"/></svg>
                     <div>
-                         <a href="${r.fileUrl}" target="_blank">${r.fileUrl.split('/').pop()}</a>
+                         <a href="${resolveUrl(r.fileUrl)}" target="_blank">${r.fileUrl.split('/').pop()}</a>
                          <p class="text-secondary" style="font-size:.75rem">Last updated: ${date}</p>
                     </div>
                     <button class="btn btn-danger btn-sm" onclick="removeResume()">Remove</button>
