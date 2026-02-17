@@ -14,7 +14,8 @@ const connectDB = async () => {
           if (process.env.DB_NAME) connectOpts.dbName = process.env.DB_NAME;
 
           const conn = await mongoose.connect(process.env.MONGODB_URI, connectOpts);
-          console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+          const dbName = conn.connection.name || connectOpts.dbName || '(unspecified)';
+          console.log(`✅ MongoDB Connected: ${conn.connection.host} (db: ${dbName})`);
      } catch (error) {
           // Log error but do NOT exit the process — serverless platforms must not call process.exit
           console.error(`❌ MongoDB Connection Error: ${error.message}`);
