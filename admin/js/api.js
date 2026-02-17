@@ -32,6 +32,7 @@ const Api = {
      /* ── Core request method ── */
      async request(endpoint, options = {}) {
           const url = `${API_BASE}${endpoint}`;
+          const method = options.method || 'GET';
           const headers = { ...options.headers };
 
           if (!(options.body instanceof FormData)) {
@@ -41,7 +42,12 @@ const Api = {
           const token = this.getToken();
           if (token) headers['Authorization'] = `Bearer ${token}`;
 
-          console.log(`[API] ${options.method || 'GET'} ${url}`);
+          // Log request with details
+          const reqLog = { method, endpoint, timestamp: new Date().toISOString() };
+          if (options.body && !(options.body instanceof FormData)) {
+               try { reqLog.bodyPreview = JSON.stringify(options.body).substring(0, 200); } catch (e) { }
+          }
+          console.log(`[API] → ${method} ${endpoint}`, reqLog);
 
           try {
                const res = await fetch(url, {
@@ -62,17 +68,21 @@ const Api = {
                const data = await res.json();
 
                if (!res.ok) {
-                    console.error(`[API] Error ${res.status} from ${url}:`, data.message || data);
+                    const errorMsg = data.message || `Request failed (${res.status})`;
+                    console.error(`[API] ✗ ${method} ${endpoint} failed (${res.status})`, errorMsg);
                     if (res.status === 401 && window.location.pathname.includes('dashboard')) {
                          console.warn('[API] 401 — redirecting to login');
                          this.clearAuth();
                          window.location.href = '/admin/';
                          return;
                     }
-                    throw new Error(data.message || `Request failed (${res.status})`);
+                    throw new Error(errorMsg);
                }
 
-               console.log(`[API] Success ${url}`, data.message || '');
+               // Log successful response with data preview
+               const dataPreview = data.data ? (typeof data.data === 'object' ? Object.keys(data.data).slice(0, 5) : typeof data.data) : null;
+               console.log(`[API] ✓ ${method} ${endpoint}`, { status: res.status, message: data.message, dataKeys: dataPreview });
+               if (data.data) console.log(`[API] Data returned:`, data.data);
                return data;
 
           } catch (err) {

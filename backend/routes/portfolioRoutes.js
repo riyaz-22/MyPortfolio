@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/portfolioController');
+const { protect } = require('../middleware/auth');
 const {
      validate,
      createPortfolioRules,
@@ -16,31 +17,33 @@ const {
 
 router
      .route('/')
-     .post(createPortfolioRules, validate, ctrl.createPortfolio)
+     .post(protect, createPortfolioRules, validate, ctrl.createPortfolio)
      .get(ctrl.getPortfolio)
-     .delete(ctrl.deletePortfolio);
+     .delete(protect, ctrl.deletePortfolio);
 
 // ─── Section-level operations ───────────────────────────────────
 
 router
      .route('/section/:section')
      .get(sectionParamRule, validate, ctrl.getSection)
-     .patch(sectionParamRule, validate, ctrl.updateSection);
+     .patch(protect, sectionParamRule, validate, ctrl.updateSection);
 
 // ─── Item-level operations on array sections ────────────────────
 
 router
      .route('/section/:section/item')
-     .post(sectionParamRule, validate, ctrl.addItemToSection);
+     .post(protect, sectionParamRule, validate, ctrl.addItemToSection);
 
 router
      .route('/section/:section/item/:itemId')
      .patch(
+          protect,
           [...sectionParamRule, ...itemIdParamRule],
           validate,
           ctrl.updateItemInSection
      )
      .delete(
+          protect,
           [...sectionParamRule, ...itemIdParamRule],
           validate,
           ctrl.deleteItemFromSection
@@ -50,6 +53,7 @@ router
 
 router.post(
      '/skills',
+     protect,
      addSkillRules,
      validate,
      (req, res, next) => {
@@ -61,6 +65,7 @@ router.post(
 
 router.post(
      '/projects',
+     protect,
      addProjectRules,
      validate,
      (req, res, next) => {
@@ -74,6 +79,7 @@ router.post(
 
 router.post(
      '/social-links',
+     protect,
      socialLinkRules,
      validate,
      ctrl.addSocialLink
@@ -81,6 +87,7 @@ router.post(
 
 router.delete(
      '/social-links/:linkId',
+     protect,
      linkIdParamRule,
      validate,
      ctrl.deleteSocialLink

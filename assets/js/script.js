@@ -58,12 +58,11 @@ navigationLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
     const targetPage = link.textContent.toLowerCase();
 
-    // Handle "Get In Touch" button special case
-    if (link.textContent === 'Get In Touch' || link.textContent === 'Contact') {
-      const contactPage = document.querySelector('[data-page="contact"]');
-      if (contactPage) {
-        activatePage(contactPage, 'contact');
-      }
+    // Handle "Get In Touch" / Contact - activate + SCROLL so banner becomes visible
+    const txt = link.textContent.trim();
+    if (txt === 'Get In Touch' || txt === 'Contact') {
+      // scrollToSection activates the contact page AND scrolls it into view
+      scrollToSection('contact');
     } else {
       // Map page names
       const pageMap = {
@@ -108,8 +107,8 @@ function activatePage(pageElement, pageName) {
     });
   }
 
-  // Scroll to top
-  window.scrollTo(0, 0);
+  // Scroll the selected section into view (smooth)
+  pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /**
@@ -185,41 +184,8 @@ formInputs.forEach(input => {
   });
 });
 
-// Handle form submission
-if (contactForm) {
-  contactForm.addEventListener('submit', handleFormSubmit);
-}
-
-function handleFormSubmit(e) {
-  e.preventDefault();
-
-  const fullname = document.querySelector('input[name="fullname"]');
-  const email = document.querySelector('input[name="email"]');
-  const message = document.querySelector('textarea[name="message"]');
-
-  // Validate inputs
-  if (!fullname.value.trim() || !email.value.trim() || !message.value.trim()) {
-    showNotification('Please fill in all fields', 'error');
-    return;
-  }
-
-  // Create mailto link
-  const subject = 'Message from Contact Form';
-  const body = `Full Name: ${fullname.value.trim()}\n\nEmail: ${email.value.trim()}\n\nMessage: ${message.value.trim()}`;
-  const mailtoLink = `mailto:riyazofficial.222001@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-  // Open email client
-  window.open(mailtoLink, '_blank');
-
-  // Show success message
-  showNotification('Redirecting to email client...', 'success');
-
-  // Reset form
-  setTimeout(() => {
-    contactForm.reset();
-    formBtn.setAttribute('disabled', '');
-  }, 1000);
-}
+// Contact form submission is handled by portfolio-data.js (API POST)
+// which replaces this mailto approach with a proper database submission.
 
 /**
  * ========================================
@@ -251,6 +217,9 @@ function showNotification(message, type = 'info') {
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
+
+// Expose globally for portfolio-data.js
+window.showNotification = showNotification;
 
 /**
  * ========================================

@@ -147,6 +147,9 @@ $('#logoutBtn')?.addEventListener('click', () => {
           console.log('[Init] Fetching portfolio data...');
           const res = await Api.getPortfolio();
           portfolio = res.data;
+          // Enable/disable social link button depending on portfolio presence
+          const addSocialBtnInit = $('#addSocialLink');
+          if (addSocialBtnInit) addSocialBtnInit.disabled = !portfolio;
           console.log('[Init] Portfolio loaded:', portfolio ? 'OK' : 'null');
      } catch (err) {
           portfolio = null;
@@ -242,6 +245,9 @@ function loadProfile() {
      form.avatar.value = pd.avatar || '';
      updateAvatarPreview();
      renderSocialLinks(pd.socialLinks || []);
+     // Disable "Add Social Link" if no portfolio exists yet
+     const addSocialBtn = $('#addSocialLink');
+     if (addSocialBtn) addSocialBtn.disabled = !portfolio;
 }
 
 function updateAvatarPreview() {
@@ -250,7 +256,23 @@ function updateAvatarPreview() {
      if (preview) preview.innerHTML = url ? `<img src="${url}" alt="avatar" onerror="this.remove()">` : '';
 }
 
-$('#profileForm')?.avatar?.addEventListener('input', updateAvatarPreview);
+$('#avatarFile')?.addEventListener('change', async e => {
+     const file = e.target.files[0];
+     if (!file) return;
+     try {
+          console.log('[Profile] Uploading avatar image...');
+          const preview = $('#avatarPreview');
+          if (preview) preview.innerHTML = '<p style="color:var(--text-secondary);font-size:.8125rem">Uploading...</p>';
+          const res = await Api.uploadFile(file);
+          const url = res.data.fileUrl;
+          $('#profileForm').avatar.value = url;
+          updateAvatarPreview();
+          toast('Profile image uploaded');
+     } catch (err) {
+          toast(err.message, 'error');
+          updateAvatarPreview();
+     }
+});
 
 function renderSocialLinks(links) {
      const c = $('#socialLinksContainer');
@@ -306,14 +328,35 @@ $('#profileForm')?.addEventListener('submit', async e => {
                console.log('[Profile] Creating new portfolio...');
                const res = await Api.createPortfolio({ personalDetails: body });
                portfolio = res.data;
-               toast('Portfolio created!');
+               console.log('[Profile] ✓ Portfolio created. Document ID:', portfolio._id);
+               console.log('[Profile] Personal details saved:', portfolio.personalDetails);
+               // Enable add social link now that portfolio exists
+               const addSocialBtnAfterCreate = $('#addSocialLink');
+               if (addSocialBtnAfterCreate) addSocialBtnAfterCreate.disabled = false;
+               toast('Portfolio created and saved to database!');
           } else {
-               console.log('[Profile] Updating personal details...');
-               await Api.updateSection('personalDetails', body);
-               Object.assign(portfolio.personalDetails, body);
-               toast('Profile updated!');
+               console.log('[Profile] Updating profile for document ID:', portfolio._id);
+               console.log('[Profile] Sending to API:', body);
+               const updateRes = await Api.updateSection('personalDetails', body);
+               // Capture updated data from API response
+               if (updateRes && updateRes.data) {
+                    console.log('[Profile] ✓ API returned updated section:', updateRes.data);
+                    portfolio.personalDetails = updateRes.data;
+               } else {
+                    // Fallback: merge locally with logged warning
+                    console.warn('[Profile] API response missing updated data, using local state');
+                    Object.assign(portfolio.personalDetails, body);
+               }
+               console.log('[Profile] Current portfolio state:', portfolio.personalDetails);
+               // Ensure add social link is enabled after updating profile
+               const addSocialBtnAfterUpdate = $('#addSocialLink');
+               if (addSocialBtnAfterUpdate) addSocialBtnAfterUpdate.disabled = false;
+               toast('Profile updated and saved to database!');
           }
-     } catch (err) { toast(err.message, 'error'); }
+     } catch (err) {
+          console.error('[Profile] Save failed with error:', err.message);
+          toast(err.message, 'error');
+     }
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -817,10 +860,34 @@ async function loadTestimonials() {
      }
 }
 
+function updateTestimonialAvatarPreview() {
+     const url = $('#testimonialForm')?.avatar?.value;
+     const preview = $('#testimonialAvatarPreview');
+     if (preview) preview.innerHTML = url ? `<img src="${url}" alt="avatar" onerror="this.remove()">` : '';
+}
+
+$('#testimonialAvatarFile')?.addEventListener('change', async e => {
+     const file = e.target.files[0];
+     if (!file) return;
+     try {
+          const preview = $('#testimonialAvatarPreview');
+          if (preview) preview.innerHTML = '<p style="color:var(--text-secondary);font-size:.8125rem">Uploading...</p>';
+          const res = await Api.uploadFile(file);
+          const url = res.data.fileUrl;
+          $('#testimonialForm').avatar.value = url;
+          updateTestimonialAvatarPreview();
+          toast('Avatar photo uploaded');
+     } catch (err) {
+          toast(err.message, 'error');
+          updateTestimonialAvatarPreview();
+     }
+});
+
 $('#addTestimonialBtn')?.addEventListener('click', () => {
      $('#testimonialModalTitle').textContent = 'Add Testimonial';
      $('#testimonialForm').reset();
      $('#testimonialForm').testimonialId.value = '';
+     updateTestimonialAvatarPreview();
      openModal('testimonialModal');
 });
 
@@ -834,6 +901,7 @@ window.editTestimonial = id => {
      form.company.value = t.company || '';
      form.content.value = t.content;
      form.avatar.value = t.avatar || '';
+     updateTestimonialAvatarPreview();
      form.rating.value = t.rating || 5;
      form.order.value = t.order || 0;
      $('#testimonialModalTitle').textContent = 'Edit Testimonial';

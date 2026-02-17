@@ -293,9 +293,14 @@
                                    </div>
                                    <div class="form-group col-span-2"><label>Bio</label><textarea name="bio" rows="4"
                                              placeholder="Brief introduction about yourself..."></textarea></div>
-                                   <div class="form-group col-span-2"><label>Avatar URL</label><input type="text"
-                                             name="avatar" placeholder="https://...">
+                                   <div class="form-group col-span-2"><label>Profile Image</label>
+                                        <div class="file-upload-area" id="avatarUploadArea">
+                                             <input type="file" id="avatarFile" accept="image/*" class="file-input">
+                                             <p>Drop image here or <span class="text-primary">browse</span></p>
+                                             <small>JPG, PNG, WEBP — Max 10MB</small>
+                                        </div>
                                         <div class="img-preview" id="avatarPreview"></div>
+                                        <input type="hidden" name="avatar">
                                    </div>
                                    <div class="form-group col-span-2">
                                         <label>Social Links</label>
@@ -683,7 +688,14 @@
                                    </div>
                                    <div class="form-group"><label>Content</label><textarea name="content" rows="4"
                                              required></textarea></div>
-                                   <div class="form-group"><label>Avatar URL</label><input type="text" name="avatar">
+                                   <div class="form-group"><label>Avatar Photo</label>
+                                        <div class="file-upload-area" id="testimonialAvatarUploadArea">
+                                             <input type="file" id="testimonialAvatarFile" accept="image/*"
+                                                  class="file-input">
+                                             <p>Drop photo or <span class="text-primary">browse</span></p>
+                                        </div>
+                                        <div class="img-preview" id="testimonialAvatarPreview"></div>
+                                        <input type="hidden" name="avatar">
                                    </div>
                                    <div class="form-grid">
                                         <div class="form-group"><label>Rating (1-5)</label><input type="number"
