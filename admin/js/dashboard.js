@@ -296,13 +296,22 @@ $('#avatarFile')?.addEventListener('change', async e => {
 function renderSocialLinks(links) {
      const c = $('#socialLinksContainer');
      if (!c) return;
-     c.innerHTML = links.length ? links.map(l => `
-          <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;">
-               <input type="text" value="${l.platform}" style="flex:1" readonly>
-               <input type="text" value="${l.url}" style="flex:2" readonly>
-               <button type="button" class="btn btn-danger btn-sm" onclick="removeSocialLink('${l._id}')">×</button>
-          </div>
-     `).join('') : '<p class="text-secondary" style="font-size:.8125rem">No social links added.</p>';
+    if (!links.length) {
+        c.innerHTML = '<p class="text-secondary" style="font-size:.8125rem">No social links added.</p>';
+        return;
+    }
+
+    c.innerHTML = links.map((l, idx) => `
+         <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;">
+              <input type="text" value="${l.platform}" style="flex:1" readonly>
+              <input type="text" value="${l.url}" style="flex:2" readonly>
+              <div style="display:flex;flex-direction:column;gap:.25rem;margin-left:.25rem">
+                   <button type="button" class="btn btn-sm" title="Move up" onclick="moveSocialLink('${l._id}','up')" ${idx===0? 'disabled' : ''}>↑</button>
+                   <button type="button" class="btn btn-sm" title="Move down" onclick="moveSocialLink('${l._id}','down')" ${idx===links.length-1? 'disabled' : ''}>↓</button>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm" style="margin-left:.5rem" onclick="removeSocialLink('${l._id}')">×</button>
+         </div>
+    `).join('');
 }
 
 $('#addSocialLink')?.addEventListener('click', async () => {
@@ -326,6 +335,33 @@ window.removeSocialLink = async id => {
           renderSocialLinks(res.data);
           toast('Social link removed');
      } catch (err) { toast(err.message, 'error'); }
+};
+
+// Move a social link up or down in the array and persist the new order
+window.moveSocialLink = async (id, dir) => {
+     try {
+          const list = portfolio?.personalDetails?.socialLinks || [];
+          const idx = list.findIndex(x => x._id === id);
+          if (idx === -1) return;
+          const newIdx = dir === 'up' ? idx - 1 : idx + 1;
+          if (newIdx < 0 || newIdx >= list.length) return;
+
+          // Create a shallow copy and swap
+          const updated = list.slice();
+          const tmp = updated[newIdx];
+          updated[newIdx] = updated[idx];
+          updated[idx] = tmp;
+
+          // Persist by updating personalDetails.socialLinks (replace array)
+          await Api.updateSection('personalDetails', { socialLinks: updated });
+          // Update local cache and re-render
+          portfolio.personalDetails.socialLinks = updated;
+          renderSocialLinks(updated);
+          toast('Social links reordered');
+     } catch (err) {
+          console.error('[SocialLinks] Reorder failed:', err.message);
+          toast(err.message, 'error');
+     }
 };
 
 $('#profileForm')?.addEventListener('submit', async e => {
