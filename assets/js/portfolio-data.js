@@ -15,7 +15,7 @@ const PortfolioRenderer = (() => {
      const port = window.location.port;
      const detected = (port === '5000' || port === '') ? '/api' : 'http://localhost:5000/api';
      // Normalize meta: allow providing root (https://host) or api path (https://host/api)
-     const API_BASE = (function() {
+     const API_BASE = (function () {
           if (metaApi) {
                const raw = metaApi.replace(/\/+$/, '');
                return raw.endsWith('/api') ? raw : `${raw}/api`;
@@ -24,6 +24,19 @@ const PortfolioRenderer = (() => {
      })(); // meta overrides default detection
 
      console.log('[PortfolioData] API base URL:', API_BASE);
+
+     // Resolve DB-stored '/api/...' paths to absolute URLs when needed
+     function resolveUrl(url) {
+          if (!url) return url;
+          try {
+               if (!url.startsWith('/api')) return url;
+               const base = API_BASE.replace(/\/+$/g, '');
+               if (base.endsWith('/api')) return base.replace(/\/api$/, '') + url;
+               return base + url;
+          } catch (e) {
+               return url;
+          }
+     }
 
      // ─── HTTP helper with enhanced logging ─────────────────────────
      async function apiFetch(path) {
@@ -79,7 +92,7 @@ const PortfolioRenderer = (() => {
           if (pd.avatar) {
                const avatarImg = document.querySelector('.sidebar .avatar-box img');
                if (avatarImg) {
-                    avatarImg.src = pd.avatar;
+                    avatarImg.src = resolveUrl(pd.avatar);
                     avatarImg.alt = `${pd.firstName || ''} ${pd.lastName || ''}`.trim();
                }
           }
@@ -371,7 +384,7 @@ const PortfolioRenderer = (() => {
 
           projectList.innerHTML = projects.map(p => {
                const category = guessProjectCategory(p);
-               const imgSrc = p.images?.[0] || './assets/images/project-placeholder.jpg';
+               const imgSrc = resolveUrl(p.images?.[0]) || './assets/images/project-placeholder.jpg';
                const linkUrl = p.liveUrl || p.githubUrl || '#';
                return `
         <div class="project-item active" data-filter-item data-category="${category}">

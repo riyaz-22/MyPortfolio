@@ -25,7 +25,12 @@ exports.uploadFile = asyncHandler(async (req, res) => {
      });
 
      const fileId = uploadStream.id;
-     const fileUrl = `/api/uploads/file/${fileId}`; // public retrieval route
+     // Build an absolute URL so stored paths work when the admin is hosted on a
+     // different origin (GitHub Pages, etc.). Use request origin when available.
+     const origin = (req && req.protocol && req.get && req.get('host'))
+          ? `${req.protocol}://${req.get('host')}`
+          : '';
+     const fileUrl = origin ? `${origin}/api/uploads/file/${fileId}` : `/api/uploads/file/${fileId}`;
 
      sendResponse(res, 200, {
           fileId: fileId.toString(),
@@ -55,7 +60,11 @@ exports.uploadMultiple = asyncHandler(async (req, res) => {
                uploadStream.on('finish', () => resolve(uploadStream.id));
                uploadStream.end(f.buffer);
           });
-          results.push({ fileId: uploadStream.id.toString(), originalName: f.originalname, fileUrl: `/api/uploads/file/${uploadStream.id}`, size: f.size, mimetype: f.mimetype });
+          const origin = (req && req.protocol && req.get && req.get('host'))
+               ? `${req.protocol}://${req.get('host')}`
+               : '';
+          const fileUrl = origin ? `${origin}/api/uploads/file/${uploadStream.id}` : `/api/uploads/file/${uploadStream.id}`;
+          results.push({ fileId: uploadStream.id.toString(), originalName: f.originalname, fileUrl, size: f.size, mimetype: f.mimetype });
      }
 
      sendResponse(res, 200, results, 'Files uploaded successfully');
