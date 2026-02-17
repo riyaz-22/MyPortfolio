@@ -14,9 +14,6 @@ const connectDB = async () => {
           const connectOpts = {
                serverSelectionTimeoutMS: 10000,
                connectTimeoutMS: 10000,
-               // Mongoose v6 uses these by default, but explicitly setting for clarity
-               useNewUrlParser: true,
-               useUnifiedTopology: true,
           };
           // If a specific DB name is provided, prefer it to avoid defaulting to 'test'
           if (process.env.DB_NAME) connectOpts.dbName = process.env.DB_NAME;
