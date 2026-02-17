@@ -9,7 +9,7 @@ console.log('[Dashboard] Script loaded');
 // ── Auth guard ──
 if (!Api.getToken()) {
      console.warn('[Dashboard] No token — redirecting to login');
-     window.location.href = '/admin/';
+     window.location.href = 'index.html';
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -98,7 +98,7 @@ $('#sidebarClose')?.addEventListener('click', () => sidebar.classList.remove('op
 $('#logoutBtn')?.addEventListener('click', () => {
      console.log('[Auth] Logging out');
      Api.clearAuth();
-     window.location.href = '/admin/';
+     window.location.href = 'index.html';
 });
 
 // ═══════════════════════════════════════════════════════════════

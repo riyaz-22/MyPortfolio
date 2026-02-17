@@ -27,7 +27,7 @@ const API_BASE = (() => {
                console.warn('[API] Running on GitHub Pages — forcing API base to', fallback);
                return fallback;
           }
-     } catch (e) {}
+     } catch (e) { }
 
      const host = location.hostname;
      const port = location.port;
@@ -96,7 +96,7 @@ const Api = {
                     if (res.status === 401 && window.location.pathname.includes('dashboard')) {
                          console.warn('[API] 401 — redirecting to login');
                          this.clearAuth();
-                         window.location.href = '/admin/';
+                         window.location.href = 'index.html';
                          return;
                     }
                     throw new Error(errorMsg);
