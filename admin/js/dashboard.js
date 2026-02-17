@@ -1010,7 +1010,7 @@ function loadResume() {
 
      const r = portfolio?.resume || {};
      const container = $('#currentResume');
-         if (r.fileUrl) {
+     if (r.fileUrl) {
           const date = r.lastUpdated ? new Date(r.lastUpdated).toLocaleDateString() : 'N/A';
           container.innerHTML = `
                <div class="resume-info">
