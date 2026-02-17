@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 // Prevent queries from silently buffering when there's no DB connection
-const mongoose = require('mongoose');
 mongoose.set('bufferCommands', false);
 
 const connectDB = async () => {
@@ -40,3 +39,4 @@ process.on('SIGINT', async () => {
 });
 
 module.exports = connectDB;
+
