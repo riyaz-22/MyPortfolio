@@ -29,6 +29,22 @@ const $$ = s => document.querySelectorAll(s);
 function show(el) { if (el) el.classList.remove('hidden'); }
 function hide(el) { if (el) el.classList.add('hidden'); }
 
+// Resolve API-backed URLs saved in DB (e.g. "/api/uploads/file/..") to
+// the correct origin when admin is hosted on GitHub Pages or another origin.
+function resolveUrl(url) {
+     if (!url) return url;
+     try {
+          if (!url.startsWith('/api')) return url;
+          const base = (typeof API_BASE !== 'undefined' ? API_BASE : '/api').replace(/\/+$|\s+$/g, '');
+          if (base.endsWith('/api')) {
+               return base.replace(/\/api$/, '') + url; // avoid duplicate /api
+          }
+          return base + url;
+     } catch (e) {
+          return url;
+     }
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  TOAST NOTIFICATIONS
 // ═══════════════════════════════════════════════════════════════
@@ -253,7 +269,10 @@ function loadProfile() {
 function updateAvatarPreview() {
      const url = $('#profileForm')?.avatar?.value;
      const preview = $('#avatarPreview');
-     if (preview) preview.innerHTML = url ? `<img src="${url}" alt="avatar" onerror="this.remove()">` : '';
+     if (preview) {
+          const resolved = resolveUrl(url);
+          preview.innerHTML = resolved ? `<img src="${resolved}" alt="avatar" onerror="this.remove()">` : '';
+     }
 }
 
 $('#avatarFile')?.addEventListener('change', async e => {
@@ -548,7 +567,7 @@ function loadProjects() {
           hide(empty);
           $('#projectsGrid').innerHTML = projects.map(p => `
                <div class="item-card">
-                    ${p.images?.[0] ? `<img src="${p.images[0]}" alt="${p.title}" onerror="this.remove()">` : ''}
+                    ${p.images?.[0] ? `<img src="${resolveUrl(p.images[0])}" alt="${p.title}" onerror="this.remove()">` : ''}
                     <h4>${p.title} ${p.featured ? '<span class="tag">Featured</span>' : ''}</h4>
                     <p>${(p.description || '').substring(0, 100)}${(p.description || '').length > 100 ? '...' : ''}</p>
                     <div class="item-meta">
@@ -584,7 +603,7 @@ window.editProject = id => {
      form.images.value = (p.images || []).join(',');
      form.order.value = p.order || 0;
      form.featured.checked = p.featured || false;
-     $('#projectImagePreview').innerHTML = p.images?.[0] ? `<img src="${p.images[0]}" alt="preview">` : '';
+     $('#projectImagePreview').innerHTML = p.images?.[0] ? `<img src="${resolveUrl(p.images[0])}" alt="preview">` : '';
      $('#projectModalTitle').textContent = 'Edit Project';
      openModal('projectModal');
 };
@@ -607,7 +626,7 @@ $('#projectImageFile')?.addEventListener('change', async e => {
           const res = await Api.uploadFile(file);
           const url = res.data.fileUrl;
           $('#projectForm').images.value = url;
-          $('#projectImagePreview').innerHTML = `<img src="${url}" alt="preview">`;
+          $('#projectImagePreview').innerHTML = `<img src="${resolveUrl(url)}" alt="preview">`;
           toast('Image uploaded');
      } catch (err) { toast(err.message, 'error'); }
 });
@@ -863,7 +882,10 @@ async function loadTestimonials() {
 function updateTestimonialAvatarPreview() {
      const url = $('#testimonialForm')?.avatar?.value;
      const preview = $('#testimonialAvatarPreview');
-     if (preview) preview.innerHTML = url ? `<img src="${url}" alt="avatar" onerror="this.remove()">` : '';
+     if (preview) {
+          const resolved = resolveUrl(url);
+          preview.innerHTML = resolved ? `<img src="${resolved}" alt="avatar" onerror="this.remove()">` : '';
+     }
 }
 
 $('#testimonialAvatarFile')?.addEventListener('change', async e => {
