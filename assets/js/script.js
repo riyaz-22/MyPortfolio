@@ -342,4 +342,37 @@ if ('IntersectionObserver' in window) {
   document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
 }
 
+/**
+ * ========================================
+ * SCROLLSPY / NAV HIGHLIGHT ON SCROLL
+ * ========================================
+ */
+
+// Use IntersectionObserver to toggle `.active` on navbar links as sections enter viewport
+(() => {
+  const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+  const sections = Array.from(document.querySelectorAll('[data-page]'));
+  if (!navLinks.length || !sections.length || !('IntersectionObserver' in window)) return;
+
+  const spyOptions = {
+    root: null,
+    threshold: 0.5,
+    rootMargin: '0px 0px -10% 0px'
+  };
+
+  const spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.dataset.page && entry.target.dataset.page.toLowerCase();
+        navLinks.forEach(link => {
+          const txt = link.textContent.trim().toLowerCase();
+          link.classList.toggle('active', txt === id);
+        });
+      }
+    });
+  }, spyOptions);
+
+  sections.forEach(s => spyObserver.observe(s));
+})();
+
 console.log('Portfolio scripts loaded successfully!');
