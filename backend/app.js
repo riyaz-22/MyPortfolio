@@ -65,7 +65,7 @@ app.use(
 );
 // Configure CORS: allow specific origins and keep credentials support
 const allowedOrigins = [
-     'https://riyaz-22.github.io/MyPortfolio',
+     'https://riyaz-22.github.io',
      'https://my-portfolio-seven-iota-38.vercel.app',
 ];
 
