@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "npm install && cd backend && npm install",
   "builds": [
     {
       "src": "backend/api/index.js",
@@ -12,11 +13,7 @@
       "dest": "/backend/api/index.js"
     },
     {
-      "src": "\/$",
-      "dest": "/api/health"
-    },
-    {
-      "src": "\/(.*)",
+      "src": "/(.*)",
       "dest": "/index.html"
     }
   ]
