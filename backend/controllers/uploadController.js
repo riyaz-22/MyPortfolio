@@ -31,11 +31,13 @@ exports.uploadFile = asyncHandler(async (req, res) => {
           ? `${req.protocol}://${req.get('host')}`
           : '';
      const fileUrl = origin ? `${origin}/api/uploads/file/${fileId}` : `/api/uploads/file/${fileId}`;
+     const downloadUrl = `${fileUrl}?download=1`;
 
      sendResponse(res, 200, {
           fileId: fileId.toString(),
           originalName: req.file.originalname,
           fileUrl,
+          downloadUrl,
           size: req.file.size,
           mimetype: req.file.mimetype,
      }, 'File uploaded successfully');
@@ -80,12 +82,14 @@ exports.uploadResume = asyncHandler(async (req, res) => {
           ? `${req.protocol}://${req.get('host')}`
           : '';
      const fileUrl = origin ? `${origin}/api/uploads/file/${fileId}` : `/api/uploads/file/${fileId}`;
+     const downloadUrl = `${fileUrl}?download=1`;
 
      sendResponse(res, 200, {
           fileId: fileId.toString(),
           originalName: req.file.originalname,
           filename,
           fileUrl,
+          downloadUrl,
           size: req.file.size,
           mimetype: req.file.mimetype,
      }, 'Resume uploaded successfully');
@@ -115,10 +119,12 @@ exports.getResumeInfo = asyncHandler(async (req, res) => {
                ? `${req.protocol}://${req.get('host')}`
                : '';
           const fileUrl = origin ? `${origin}/api/uploads/file/${fileDoc._id}` : `/api/uploads/file/${fileDoc._id}`;
+          const downloadUrl = `${fileUrl}?download=1`;
 
           sendResponse(res, 200, {
                fileId: fileDoc._id.toString(),
                fileUrl,
+               downloadUrl,
                filename: fileDoc.metadata?.originalName || fileDoc.filename,
                originalName: fileDoc.metadata?.originalName || fileDoc.filename,
                mimetype: fileDoc.contentType,
@@ -147,7 +153,7 @@ exports.getResumeInfo = asyncHandler(async (req, res) => {
           : '';
      const fileUrl = origin ? `${origin}/assets/images/${candidate}` : `/assets/images/${candidate}`;
 
-     sendResponse(res, 200, { fileUrl, filename: candidate, originalName: candidate }, 'Resume available');
+     sendResponse(res, 200, { fileUrl, downloadUrl: fileUrl, filename: candidate, originalName: candidate }, 'Resume available');
 });
 
 // ── Upload multiple files (stream each to GridFS) ────────────────
@@ -200,7 +206,15 @@ exports.getFileById = asyncHandler(async (req, res) => {
      if (fileDoc.contentType) res.setHeader('Content-Type', fileDoc.contentType);
      else res.setHeader('Content-Type', 'application/octet-stream');
 
-     // Do not force download; let browser handle rendering based on Content-Type
+     const wantsDownload = ['1', 'true', 'yes'].includes(String(req.query.download || '').toLowerCase());
+     const preferredName = fileDoc.metadata?.originalName || fileDoc.filename || 'file';
+     const asciiName = preferredName.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_');
+     const encodedName = encodeURIComponent(preferredName);
+     if (wantsDownload) {
+          res.setHeader('Content-Disposition', `attachment; filename="${asciiName}"; filename*=UTF-8''${encodedName}`);
+     } else {
+          res.setHeader('Content-Disposition', 'inline');
+     }
 
      const downloadStream = bucket.openDownloadStream(_id);
      downloadStream.on('error', () => { res.status(404).json({ success: false, message: 'File not found' }); });

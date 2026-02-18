@@ -316,11 +316,13 @@ async function loadResume() {
           const res = await Api.getResume();
           const info = res.data || {};
           if (info.fileUrl) {
+               const viewUrl = info.fileUrl;
+               const downloadUrl = info.downloadUrl || `${info.fileUrl}${info.fileUrl.includes('?') ? '&' : '?'}download=1`;
                current.innerHTML = `
                     <p>Current resume: <strong>${info.filename || info.fileUrl.split('/').pop()}</strong></p>
                     <div style="margin-top:.5rem">
-                         <a class="btn btn-outline btn-sm" href="${info.fileUrl}" target="_blank">View</a>
-                         <a class="btn btn-primary btn-sm" href="${info.fileUrl}" download>Download</a>
+                         <a class="btn btn-outline btn-sm" href="${viewUrl}" target="_blank">View</a>
+                         <a class="btn btn-primary btn-sm" href="${downloadUrl}">Download</a>
                     </div>
                `;
                show(current);
@@ -343,12 +345,13 @@ $('#resumeFile')?.addEventListener('change', async e => {
           const current = $('#currentResume');
           if (current) current.innerHTML = '<p style="color:var(--text-secondary);font-size:.9rem">Uploading...</p>';
           const res = await Api.uploadResume(file);
-          const url = res.data.fileUrl;
+          const viewUrl = res.data.fileUrl;
+          const downloadUrl = res.data.downloadUrl || `${res.data.fileUrl}${res.data.fileUrl.includes('?') ? '&' : '?'}download=1`;
           toast('Resume uploaded');
           // Refresh display
           portfolio = portfolio; // keep existing cache unchanged
           // Update current resume display
-          if (current) current.innerHTML = `\n                    <p>Current resume: <strong>${res.data.originalName}</strong></p>\n                    <div style="margin-top:.5rem">\n                         <a class="btn btn-outline btn-sm" href="${url}" target="_blank">View</a>\n                         <a class="btn btn-primary btn-sm" href="${url}" download>Download</a>\n                    </div>\n               `;
+          if (current) current.innerHTML = `\n                    <p>Current resume: <strong>${res.data.originalName}</strong></p>\n                    <div style="margin-top:.5rem">\n                         <a class="btn btn-outline btn-sm" href="${viewUrl}" target="_blank">View</a>\n                         <a class="btn btn-primary btn-sm" href="${downloadUrl}">Download</a>\n                    </div>\n               `;
      } catch (err) {
           toast(err.message, 'error');
      } finally {

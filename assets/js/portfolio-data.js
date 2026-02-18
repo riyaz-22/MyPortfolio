@@ -245,8 +245,8 @@ const PortfolioRenderer = (() => {
           const resumeBtn = document.querySelector('#resumeBtn') || document.querySelector('.hero-cta .btn-secondary');
           if (resume?.fileUrl) {
                if (resumeBtn) {
-                    resumeBtn.setAttribute('href', resolveUrl(resume.fileUrl));
-                    resumeBtn.setAttribute('target', '_blank');
+                    const downloadUrl = resume.downloadUrl || `${resume.fileUrl}${resume.fileUrl.includes('?') ? '&' : '?'}download=1`;
+                    resumeBtn.setAttribute('href', resolveUrl(downloadUrl));
                     resumeBtn.setAttribute('download', '');
                     resumeBtn.style.display = '';
                }
@@ -254,7 +254,6 @@ const PortfolioRenderer = (() => {
                if (resumeBtn) {
                     resumeBtn.removeAttribute('href');
                     resumeBtn.removeAttribute('download');
-                    resumeBtn.removeAttribute('target');
                     resumeBtn.style.display = 'none';
                }
           }
