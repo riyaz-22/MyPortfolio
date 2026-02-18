@@ -91,6 +91,7 @@ function navigateTo(section) {
           overview: loadOverview, profile: loadProfile, skills: loadSkills,
           services: loadServices, projects: loadProjects, experience: loadExperience,
           education: loadEducation, testimonials: loadTestimonials,
+          resume: loadResume,
           contact: loadMessages,
      };
      if (loaders[section]) loaders[section]();
@@ -300,6 +301,61 @@ function loadProfile() {
      const addSocialBtn = $('#addSocialLink');
      if (addSocialBtn) addSocialBtn.disabled = !portfolio;
 }
+
+// ═══════════════════════════════════════════════════════════════
+//  RESUME
+// ═══════════════════════════════════════════════════════════════
+async function loadResume() {
+     console.log('[Resume] Loading...');
+     const loader = $('#resumeLoader');
+     const content = $('#resumeContent');
+     const current = $('#currentResume');
+     hide(loader); hide(current); show(content);
+
+     try {
+          const res = await Api.getResume();
+          const info = res.data || {};
+          if (info.fileUrl) {
+               current.innerHTML = `
+                    <p>Current resume: <strong>${info.filename || info.fileUrl.split('/').pop()}</strong></p>
+                    <div style="margin-top:.5rem">
+                         <a class="btn btn-outline btn-sm" href="${info.fileUrl}" target="_blank">View</a>
+                         <a class="btn btn-primary btn-sm" href="${info.fileUrl}" download>Download</a>
+                    </div>
+               `;
+               show(current);
+          } else {
+               current.innerHTML = '<p class="text-secondary">No resume uploaded yet.</p>';
+               show(current);
+          }
+     } catch (err) {
+          console.warn('[Resume] No resume:', err.message);
+          current.innerHTML = '<p class="text-secondary">No resume uploaded yet.</p>';
+          show(current);
+     }
+}
+
+// Handle resume file upload (admin)
+$('#resumeFile')?.addEventListener('change', async e => {
+     const file = e.target.files[0];
+     if (!file) return;
+     try {
+          const current = $('#currentResume');
+          if (current) current.innerHTML = '<p style="color:var(--text-secondary);font-size:.9rem">Uploading...</p>';
+          const res = await Api.uploadResume(file);
+          const url = res.data.fileUrl;
+          toast('Resume uploaded');
+          // Refresh display
+          portfolio = portfolio; // keep existing cache unchanged
+          // Update current resume display
+          if (current) current.innerHTML = `\n                    <p>Current resume: <strong>${res.data.originalName}</strong></p>\n                    <div style="margin-top:.5rem">\n                         <a class="btn btn-outline btn-sm" href="${url}" target="_blank">View</a>\n                         <a class="btn btn-primary btn-sm" href="${url}" download>Download</a>\n                    </div>\n               `;
+     } catch (err) {
+          toast(err.message, 'error');
+     } finally {
+          // Clear file input so same file can be reselected later
+          const inp = $('#resumeFile'); if (inp) inp.value = '';
+     }
+});
 
 function updateAvatarPreview() {
      const url = $('#profileForm')?.avatar?.value;

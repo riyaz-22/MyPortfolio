@@ -41,6 +41,55 @@ exports.uploadFile = asyncHandler(async (req, res) => {
      }, 'File uploaded successfully');
 });
 
+// ── Upload resume and save to assets/images folder (overwrites existing resume) ──
+exports.uploadResume = asyncHandler(async (req, res) => {
+     if (!req.file) throw new ApiError(400, 'No file uploaded');
+     const assetsDir = path.join(__dirname, '..', '..', 'assets', 'images');
+     if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
+
+     const ext = path.extname(req.file.originalname) || '.pdf';
+     const filename = `resume${ext}`;
+     const filePath = path.join(assetsDir, filename);
+
+     await fs.promises.writeFile(filePath, req.file.buffer);
+
+     const origin = (req && req.protocol && req.get && req.get('host'))
+          ? `${req.protocol}://${req.get('host')}`
+          : '';
+     const fileUrl = origin ? `${origin}/assets/images/${filename}` : `/assets/images/${filename}`;
+
+     sendResponse(res, 200, {
+          originalName: req.file.originalname,
+          fileUrl,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+     }, 'Resume uploaded successfully');
+});
+
+// ── Return resume info (public URL) if present ─────────────────────────────────
+exports.getResumeInfo = asyncHandler(async (req, res) => {
+     const assetsDir = path.join(__dirname, '..', '..', 'assets', 'images');
+     if (!fs.existsSync(assetsDir)) {
+          sendResponse(res, 404, null, 'Resume not found');
+          return;
+     }
+
+     // Look for a file named resume.* (pdf/doc/docx)
+     const files = await fs.promises.readdir(assetsDir);
+     const candidate = files.find(f => f.toLowerCase().startsWith('resume.'));
+     if (!candidate) {
+          sendResponse(res, 404, null, 'Resume not found');
+          return;
+     }
+
+     const origin = (req && req.protocol && req.get && req.get('host'))
+          ? `${req.protocol}://${req.get('host')}`
+          : '';
+     const fileUrl = origin ? `${origin}/assets/images/${candidate}` : `/assets/images/${candidate}`;
+
+     sendResponse(res, 200, { fileUrl, filename: candidate }, 'Resume available');
+});
+
 // ── Upload multiple files (stream each to GridFS) ────────────────
 exports.uploadMultiple = asyncHandler(async (req, res) => {
      if (!req.files || req.files.length === 0) {

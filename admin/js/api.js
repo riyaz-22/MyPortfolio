@@ -10,6 +10,15 @@ const API_BASE = (() => {
      try {
           const m = document.querySelector('meta[name="api-base"]');
           if (m && m.content) {
+               // If running locally, prefer the local backend (avoid hitting production API)
+               try {
+                    const host = (location && location.hostname) ? location.hostname : '';
+                    if (host === 'localhost' || host === '127.0.0.1') {
+                         console.warn('[API] Running on localhost — forcing API base to http://localhost:5000/api (dev override)');
+                         return 'http://localhost:5000/api';
+                    }
+               } catch (e) { /* ignore */ }
+
                // Normalize: accept either root (https://host) or full API URL (https://host/api)
                const raw = m.content.replace(/\/+$/, '');
                const normalized = raw.endsWith('/api') ? raw : `${raw}/api`;
@@ -161,6 +170,12 @@ const Api = {
           fd.append(fieldName, file);
           return this.request('/uploads/single', { method: 'POST', body: fd });
      },
+     uploadResume(file, fieldName = 'file') {
+          const fd = new FormData();
+          fd.append(fieldName, file);
+          return this.request('/uploads/resume', { method: 'POST', body: fd });
+     },
+     getResume() { return this.request('/uploads/resume'); },
      deleteUpload(idOrName) { return this.request(`/uploads/${idOrName}`, { method: 'DELETE' }); },
      /* ── Analytics ── */
      getAnalyticsSummary() { return this.request('/analytics/summary'); },

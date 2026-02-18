@@ -17,6 +17,14 @@ const PortfolioRenderer = (() => {
      // Normalize meta: allow providing root (https://host) or api path (https://host/api)
      const API_BASE = (function () {
           if (metaApi) {
+               try {
+                    const host = (location && location.hostname) ? location.hostname : '';
+                    if (host === 'localhost' || host === '127.0.0.1') {
+                         console.warn('[PortfolioData] Running on localhost — overriding meta api-base to http://localhost:5000/api');
+                         return 'http://localhost:5000/api';
+                    }
+               } catch (e) { /* ignore */ }
+
                const raw = metaApi.replace(/\/+$/, '');
                return raw.endsWith('/api') ? raw : `${raw}/api`;
           }
@@ -233,9 +241,16 @@ const PortfolioRenderer = (() => {
                heroTitle.innerHTML = `<span class="text-gradient">${pd.title.split(' ')[0]}</span> ${pd.title.split(' ').slice(1).join(' ') || ''}`;
           }
 
-          // Remove resume download behavior (disable download link)
+          // Show/hide resume download button depending on availability
+          const resumeBtn = document.querySelector('#resumeBtn') || document.querySelector('.hero-cta .btn-secondary');
           if (resume?.fileUrl) {
-               const resumeBtn = document.querySelector('.hero-cta .btn-secondary');
+               if (resumeBtn) {
+                    resumeBtn.setAttribute('href', resolveUrl(resume.fileUrl));
+                    resumeBtn.setAttribute('target', '_blank');
+                    resumeBtn.setAttribute('download', '');
+                    resumeBtn.style.display = '';
+               }
+          } else {
                if (resumeBtn) {
                     resumeBtn.removeAttribute('href');
                     resumeBtn.removeAttribute('download');
@@ -732,12 +747,13 @@ const PortfolioRenderer = (() => {
           console.log('[PortfolioData] Initializing — fetching from MongoDB API...');
           console.log('[PortfolioData] Request timestamp:', new Date().toISOString());
 
-          // Fetch all data in parallel
+          // Fetch all data in parallel (including resume info)
           const startTime = performance.now();
-          const [portfolioRes, servicesRes, testimonialsRes] = await Promise.all([
+          const [portfolioRes, servicesRes, testimonialsRes, resumeRes] = await Promise.all([
                apiFetch('/portfolio'),
                apiFetch('/services'),
                apiFetch('/testimonials'),
+               apiFetch('/uploads/resume'),
           ]);
           const loadTime = performance.now() - startTime;
           console.log(`[PortfolioData] Data fetched in ${loadTime.toFixed(0)}ms`);
@@ -768,7 +784,9 @@ const PortfolioRenderer = (() => {
 
           // Render all sections
           renderSidebar(pd);
-          renderHero(pd, portfolio.resume);
+          // Prefer resume from the dedicated endpoint; fallback to portfolio.resume
+          const resumeInfo = resumeRes?.data || portfolio.resume || null;
+          renderHero(pd, resumeInfo);
           renderAbout(pd);
           renderServices(services);
           renderSkills(portfolio.skills || []);

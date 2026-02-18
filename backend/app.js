@@ -68,6 +68,7 @@ app.use(
 const allowedOrigins = [
      'https://riyaz-22.github.io',
      'https://my-portfolio-seven-iota-38.vercel.app',
+     'http://localhost:5000'
 ];
 
 if (process.env.CLIENT_URL) {
