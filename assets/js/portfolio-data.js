@@ -414,31 +414,51 @@ const PortfolioRenderer = (() => {
      // ═══════════════════════════════════════════════════════════════
      //  RENDER: Portfolio / Projects
      // ═══════════════════════════════════════════════════════════════
-     function renderProjects(projects) {
-          if (!projects || projects.length === 0) return;
+
+     // ── State: all projects + current filter ──
+     let _allProjects = [];
+     let _activeFilter = 'web'; // default to showing Web projects
+
+     function projectTypeToCategory(type) {
+          if (!type) return 'web';
+          const map = { 'Web': 'web', 'Mobile': 'mobile', 'Design': 'design', 'UI/UX': 'uiux' };
+          return map[type] || 'web';
+     }
+
+     function renderFilteredProjects() {
           const projectList = document.querySelector('.project-list');
           if (!projectList) return;
 
-          // Collect unique categories for filters
-          const categories = new Set();
-          projects.forEach(p => {
-               (p.techStack || []).forEach(t => {
-                    const cat = guessCategoryFromTech(t);
-                    if (cat !== 'all') categories.add(cat);
-               });
-          });
+          // Filter projects by selected type
+          const filtered = _allProjects.filter(p => projectTypeToCategory(p.projectType) === _activeFilter);
 
-          projectList.innerHTML = projects.map(p => {
-               const category = guessProjectCategory(p);
+          if (filtered.length === 0) {
+               projectList.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:2rem 0;grid-column:1/-1">No projects found for this type.</p>';
+               return;
+          }
+
+          projectList.innerHTML = filtered.map((p, i) => {
                const imgSrc = resolveUrl(p.images?.[0]) || './assets/images/project-placeholder.jpg';
                const linkUrl = p.liveUrl || p.githubUrl || '#';
+
+               // Extract domain from liveUrl for favicon
+               let faviconUrl = null;
+               if (p.liveUrl) {
+                    try {
+                         const url = new URL(p.liveUrl);
+                         faviconUrl = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                    } catch (e) {
+                         // If URL parsing fails, skip favicon
+                    }
+               }
+
                return `
-        <div class="project-item active" data-filter-item data-category="${category}">
+        <div class="project-item active" data-filter-item data-category="${projectTypeToCategory(p.projectType)}" style="animation-delay:${(i * 0.1).toFixed(1)}s">
           <a href="${linkUrl}" target="_blank" rel="noopener noreferrer">
             <article class="project-card">
               <div class="project-img">
                 <img src="${imgSrc}" alt="${p.title}" onerror="this.style.display='none'">
-                <div class="project-item-icon-box">🔗</div>
+                ${faviconUrl ? `<img src="${faviconUrl}" alt="favicon" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:8px;background:white;padding:6px;box-shadow:0 4px 12px rgba(0,0,0,0.2)" onerror="this.style.display='none'">` : '<div class="project-item-icon-box">🔗</div>'}
               </div>
               <h3 class="project-title">${p.title}</h3>
               <div class="project-category">${p.description ? p.description.substring(0, 60) : ''}</div>
@@ -451,11 +471,57 @@ const PortfolioRenderer = (() => {
       `;
           }).join('');
 
-          // Update filter buttons based on actual categories
-          updateFilterButtons(categories);
-
-          // Re-observe and re-bind filter
           reObserveItems('.project-item');
+     }
+
+     function renderProjects(projects) {
+          if (!projects || projects.length === 0) return;
+          const projectList = document.querySelector('.project-list');
+          if (!projectList) return;
+
+          // Assign projectType fallback for legacy projects without a type
+          _allProjects = projects.map(p => ({
+               ...p,
+               projectType: p.projectType || guessProjectCategory(p),
+          }));
+
+          // Determine which types actually have projects
+          const typesWithData = new Set(_allProjects.map(p => projectTypeToCategory(p.projectType)));
+
+          // Hide filter buttons/select items for types with no projects
+          const allTypes = ['web', 'mobile', 'design', 'uiux'];
+          const filterList = document.querySelector('.filter-list');
+          if (filterList) {
+               const labels = { web: 'Web', mobile: 'Mobile', design: 'Design', uiux: 'UI/UX' };
+               filterList.innerHTML = allTypes
+                    .filter(t => typesWithData.has(t))
+                    .map(t => `<li><button class="filter-btn" data-filter-btn="${t}">${labels[t]}</button></li>`)
+                    .join('');
+          }
+          const selectList = document.querySelector('.select-list');
+          if (selectList) {
+               const labels = { web: 'Web', mobile: 'Mobile', design: 'Design', uiux: 'UI/UX' };
+               selectList.innerHTML = allTypes
+                    .filter(t => typesWithData.has(t))
+                    .map(t => `<li class="select-item" data-select-item="${t}"><button>${labels[t]}</button></li>`)
+                    .join('');
+          }
+
+          // Default to the first available type
+          const firstType = allTypes.find(t => typesWithData.has(t)) || 'web';
+          _activeFilter = firstType;
+
+          // Render projects for the default type
+          renderFilteredProjects();
+
+          // Mark the default filter button as active
+          const defaultBtn = document.querySelector(`[data-filter-btn="${firstType}"]`);
+          if (defaultBtn) defaultBtn.classList.add('active');
+          const selectVal = document.querySelector('[data-select-value]');
+          const typeLabels = { web: 'Web', mobile: 'Mobile', design: 'Design', uiux: 'UI/UX' };
+          if (selectVal) selectVal.textContent = typeLabels[firstType] || 'Web';
+
+          // Bind filter buttons & select
           rebindProjectFilters();
      }
 
@@ -464,63 +530,31 @@ const PortfolioRenderer = (() => {
           const title = (project.title || '').toLowerCase();
           const desc = (project.description || '').toLowerCase();
           const all = `${stack} ${title} ${desc}`;
-          if (all.match(/mobile|ionic|react native|flutter|capacitor|android|ios/)) return 'mobile';
-          if (all.match(/design|figma|sketch|ui kit|brand/)) return 'design';
-          if (all.match(/ui\/ux|ux|prototype|wireframe|user research/)) return 'uiux';
-          return 'web';
-     }
-
-     function guessCategoryFromTech(tech) {
-          const t = tech.toLowerCase();
-          if (t.match(/mobile|ionic|react native|flutter|capacitor/)) return 'mobile';
-          if (t.match(/design|figma|sketch/)) return 'design';
-          if (t.match(/ui\/ux|ux|prototype/)) return 'uiux';
-          return 'web';
-     }
-
-     function updateFilterButtons(categories) {
-          // Update desktop filter buttons
-          const filterList = document.querySelector('.filter-list');
-          if (filterList) {
-               let html = '<li><button class="filter-btn active" data-filter-btn="all">All</button></li>';
-               const defaultCats = ['web', 'mobile', 'design', 'uiux'];
-               const allCats = new Set([...defaultCats, ...categories]);
-               allCats.forEach(cat => {
-                    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
-                    html += `<li><button class="filter-btn" data-filter-btn="${cat}">${label === 'Uiux' ? 'UI/UX' : label}</button></li>`;
-               });
-               filterList.innerHTML = html;
-          }
-
-          // Update mobile select dropdown
-          const selectList = document.querySelector('.select-list');
-          if (selectList) {
-               let html = '<li class="select-item" data-select-item="all"><button>All</button></li>';
-               const defaultCats = ['web', 'mobile', 'design', 'uiux'];
-               const allCats = new Set([...defaultCats, ...categories]);
-               allCats.forEach(cat => {
-                    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
-                    html += `<li class="select-item" data-select-item="${cat}"><button>${label === 'Uiux' ? 'UI/UX' : label}</button></li>`;
-               });
-               selectList.innerHTML = html;
-          }
+          if (all.match(/mobile|ionic|react native|flutter|capacitor|android|ios/)) return 'Mobile';
+          if (all.match(/design|figma|sketch|ui kit|brand/)) return 'Design';
+          if (all.match(/ui\/ux|ux|prototype|wireframe|user research/)) return 'UI/UX';
+          return 'Web';
      }
 
      function rebindProjectFilters() {
-          // Re-bind filter buttons after dynamic render
           const filterBtns = document.querySelectorAll('[data-filter-btn]');
-          const projectItems = document.querySelectorAll('[data-filter-item]');
           const filterSelectItems = document.querySelectorAll('[data-select-item]');
           const filterSelectValue = document.querySelector('[data-select-value]');
 
           filterBtns.forEach(btn => {
                btn.addEventListener('click', () => {
+                    const val = btn.getAttribute('data-filter-btn');
+                    // Update active state
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    const val = btn.getAttribute('data-filter-btn');
-                    projectItems.forEach(item => {
-                         item.classList.toggle('active', val === 'all' || item.dataset.category === val);
-                    });
+                    // Update mobile select label to match
+                    if (filterSelectValue) {
+                         const labels = { web: 'Web', mobile: 'Mobile', design: 'Design', uiux: 'UI/UX' };
+                         filterSelectValue.textContent = labels[val] || val;
+                    }
+                    // Set filter and re-render
+                    _activeFilter = val;
+                    renderFilteredProjects();
                });
           });
 
@@ -530,9 +564,11 @@ const PortfolioRenderer = (() => {
                     if (filterSelectValue) filterSelectValue.textContent = item.textContent;
                     const filterSelect = document.querySelector('[data-select]');
                     if (filterSelect) filterSelect.classList.remove('active');
-                    projectItems.forEach(pi => {
-                         pi.classList.toggle('active', val === 'all' || pi.dataset.category === val);
-                    });
+                    // Also sync desktop filter buttons
+                    filterBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-filter-btn') === val));
+                    // Set filter and re-render
+                    _activeFilter = val;
+                    renderFilteredProjects();
                });
           });
      }

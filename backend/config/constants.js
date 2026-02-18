@@ -12,6 +12,7 @@ module.exports = {
           'Other',
      ],
      PROFICIENCY_LEVELS: ['Beginner', 'Intermediate', 'Advanced', 'Expert'],
+     PROJECT_TYPES: ['Web', 'Mobile', 'Design', 'UI/UX'],
      SECTIONS: [
           'personalDetails',
           'skills',

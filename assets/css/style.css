@@ -26,8 +26,8 @@
   --accent-error: #ef4444;
 
 
-  --ff-heading: 'Space Grotesk', sans-serif;
-  --ff-body: 'Inter', sans-serif;
+  --ff-heading: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-body: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --fs-hero: clamp(2.5rem, 8vw, 4.5rem);
   --fs-h1: clamp(2rem, 6vw, 3.5rem);
@@ -132,6 +132,9 @@ body {
   line-height: 1.6;
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   transition: background-color var(--duration-base) var(--ease-in-out),
     color var(--duration-base) var(--ease-in-out);
 }
@@ -145,7 +148,7 @@ h6 {
   font-family: var(--ff-heading);
   font-weight: var(--fw-bold);
   line-height: 1.2;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -345,13 +348,122 @@ main {
   position: sticky;
   top: calc(var(--navbar-height) + var(--navbar-gap));
   height: fit-content;
+  perspective: 1200px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-2xl);
+  padding: 0;
+  backdrop-filter: none;
+  box-shadow: none;
+  animation: none;
+}
+
+/* ── Flip-card internals ── */
+
+.sidebar-flipper {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease-in-out;
+}
+
+.sidebar.flipped .sidebar-flipper {
+  transform: rotateY(180deg);
+}
+
+.sidebar-front,
+.sidebar-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-2xl);
-  padding: var(--spacing-xl);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow-xl);
-  animation: none;
+}
+
+.sidebar-front {
+  padding: var(--spacing-xl);
+}
+
+/* Front face stays in normal flow → sets intrinsic height */
+.sidebar-front {
+  position: relative;
+  z-index: 1;
+}
+
+/* Back face overlays the front, filling the same space */
+.sidebar-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotateY(180deg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+}
+
+/* Hide back-face content from screen-readers while not visible */
+.sidebar:not(.flipped) .sidebar-back {
+  visibility: hidden;
+}
+
+.sidebar.flipped .sidebar-front {
+  visibility: hidden;
+}
+
+/* Back-face header button — centred & prominent */
+.sidebar-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: auto;
+  padding: var(--spacing-base) var(--spacing-xl);
+  background: var(--accent-gradient);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-small);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform var(--duration-base) var(--ease-in-out),
+    box-shadow var(--duration-base) var(--ease-in-out);
+  flex-shrink: 0;
+  margin-top: var(--spacing-xs);
+}
+
+.sidebar-back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.sidebar-back-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+/* Contact items inside the back face */
+.sidebar-back .contacts-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+}
+
+.sidebar-back .separator {
+  margin: var(--spacing-xs) 0;
+}
+
+.sidebar-back .social-list {
+  padding-top: 0;
 }
 
 @keyframes slideInLeft {
@@ -444,20 +556,6 @@ main {
 
 .info_more-btn ion-icon {
   transition: transform var(--duration-base) var(--ease-in-out);
-}
-
-.info_more-btn.active ion-icon {
-  transform: rotate(180deg);
-}
-
-.sidebar-info_more {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height var(--duration-base) var(--ease-in-out);
-}
-
-.sidebar.active .sidebar-info_more {
-  max-height: 500px;
 }
 
 .separator {
@@ -1382,9 +1480,10 @@ header {
   transform: translateX(-50%);
 }
 
-.portfolio .projects {
+.portfolio .projects,
+.projects-section {
   width: 100%;
-  max-width: 1040px;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
@@ -1504,44 +1603,34 @@ header {
 
 .project-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
   width: 100%;
-  margin: 0;
+  max-width: 1100px;
+  margin: 0 auto;
   align-items: stretch;
 }
 
+@media (max-width: 900px) {
+  .project-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .project-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project-item {
-  display: flex;
+  display: none;
   animation: slideUp 0.6s var(--ease-out) backwards;
 }
 
 .project-item.active {
+  display: flex;
   animation: slideUp 0.6s var(--ease-out);
-}
-
-.project-item:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.project-item:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.project-item:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.project-item:nth-child(4) {
-  animation-delay: 0.4s;
-}
-
-.project-item:nth-child(5) {
-  animation-delay: 0.5s;
-}
-
-.project-item:nth-child(6) {
-  animation-delay: 0.6s;
 }
 
 .project-card {
@@ -1828,6 +1917,11 @@ textarea.form-input {
   .sidebar {
     position: static;
     top: auto;
+    perspective: 1200px;
+  }
+
+  .sidebar-back {
+    position: absolute;
   }
 
   .navbar {
@@ -2141,5 +2235,6 @@ textarea.form-input {
   .sidebar {
     position: static;
     margin-bottom: 2rem;
+    perspective: none;
   }
 }

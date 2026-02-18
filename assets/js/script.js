@@ -27,23 +27,37 @@ themeBtn?.addEventListener('click', () => {
 
 /**
  * ========================================
- * SIDEBAR TOGGLE
+ * SIDEBAR 3-D FLIP TOGGLE
  * ========================================
  */
 
 const sidebar = document.querySelector('[data-sidebar]');
 const sidebarBtn = document.querySelector('[data-sidebar-btn]');
+const sidebarBackBtn = document.querySelector('[data-sidebar-back-btn]');
 
-sidebarBtn?.addEventListener('click', () => {
-  sidebar.classList.toggle('active');
-});
+function flipSidebar(show) {
+  if (!sidebar) return;
+  const flipped = typeof show === 'boolean' ? show : !sidebar.classList.contains('flipped');
+  sidebar.classList.toggle('flipped', flipped);
 
-// Close sidebar when clicking outside
-document.addEventListener('click', (e) => {
-  if (!sidebar?.contains(e.target) && !sidebarBtn?.contains(e.target)) {
-    sidebar?.classList.remove('active');
-  }
-});
+  // ARIA: tell assistive tech which face is visible
+  sidebarBtn?.setAttribute('aria-expanded', String(flipped));
+
+  // After the transition ends, move focus to the newly-visible face
+  const flipper = sidebar.querySelector('[data-sidebar-flipper]');
+  const onEnd = () => {
+    if (flipped) {
+      sidebarBackBtn?.focus();
+    } else {
+      sidebarBtn?.focus();
+    }
+    flipper?.removeEventListener('transitionend', onEnd);
+  };
+  flipper?.addEventListener('transitionend', onEnd);
+}
+
+sidebarBtn?.addEventListener('click', () => flipSidebar(true));
+sidebarBackBtn?.addEventListener('click', () => flipSidebar(false));
 
 /**
  * ========================================
@@ -118,50 +132,15 @@ function activatePage(pageElement, pageName) {
  */
 
 const filterSelect = document.querySelector('[data-select]');
-const filterSelectItems = document.querySelectorAll('[data-select-item]');
-const filterSelectValue = document.querySelector('[data-select-value]');
-const filterBtns = document.querySelectorAll('[data-filter-btn]');
-const projectItems = document.querySelectorAll('[data-filter-item]');
 
-// Filter select dropdown
+// Filter select dropdown toggle
 filterSelect?.addEventListener('click', () => {
   filterSelect.classList.toggle('active');
 });
 
-// Filter select items
-filterSelectItems.forEach(item => {
-  item.addEventListener('click', () => {
-    const selectedValue = item.getAttribute('data-select-item');
-    filterSelectValue.textContent = item.textContent;
-    filterSelect.classList.remove('active');
-    filterFunc(selectedValue);
-  });
-});
-
-// Filter buttons
-filterBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    // Remove active from all buttons
-    filterBtns.forEach(b => b.classList.remove('active'));
-    // Add active to clicked button
-    btn.classList.add('active');
-    // Filter projects
-    const selectedValue = btn.getAttribute('data-filter-btn');
-    filterFunc(selectedValue);
-  });
-});
-
-function filterFunc(selectedValue) {
-  projectItems.forEach(item => {
-    if (selectedValue === 'all') {
-      item.classList.add('active');
-    } else if (item.dataset.category === selectedValue) {
-      item.classList.add('active');
-    } else {
-      item.classList.remove('active');
-    }
-  });
-}
+// Note: Filter button click handlers and select item handlers are bound
+// dynamically in portfolio-data.js after projects are rendered.
+// The script.js only handles the select dropdown open/close toggle.
 
 /**
  * ========================================
@@ -273,9 +252,9 @@ document.querySelectorAll('.service-item, .project-item').forEach(item => {
  */
 
 document.addEventListener('keydown', (e) => {
-  // Close sidebar with Escape key
+  // Flip sidebar back with Escape key
   if (e.key === 'Escape') {
-    sidebar?.classList.remove('active');
+    flipSidebar(false);
     filterSelect?.classList.remove('active');
   }
 });

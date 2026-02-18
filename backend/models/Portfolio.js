@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { SKILL_CATEGORIES, PROFICIENCY_LEVELS } = require('../config/constants');
+const { SKILL_CATEGORIES, PROFICIENCY_LEVELS, PROJECT_TYPES } = require('../config/constants');
 
 // ─── Sub-Schemas ────────────────────────────────────────────────
 
@@ -61,6 +61,15 @@ const ProjectSchema = new mongoose.Schema(
                type: String,
                required: [true, 'Project title is required'],
                trim: true,
+          },
+          projectType: {
+               type: String,
+               required: [true, 'Project type is required'],
+               enum: {
+                    values: PROJECT_TYPES,
+                    message: '{VALUE} is not a valid project type',
+               },
+               default: 'Web',
           },
           description: {
                type: String,

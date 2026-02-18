@@ -696,6 +696,7 @@ function loadProjects() {
                <div class="item-card">
                     ${p.images?.[0] ? `<img src="${resolveUrl(p.images[0])}" alt="${p.title}" onerror="this.remove()">` : ''}
                     <h4>${p.title} ${p.featured ? '<span class="tag">Featured</span>' : ''}</h4>
+                    <span class="tag">${p.projectType || 'Web'}</span>
                     <p>${(p.description || '').substring(0, 100)}${(p.description || '').length > 100 ? '...' : ''}</p>
                     <div class="item-meta">
                          ${(p.techStack || []).map(t => `<span class="tag">${t}</span>`).join('')}
@@ -723,6 +724,7 @@ window.editProject = id => {
      const form = $('#projectForm');
      form.projectId.value = id;
      form.title.value = p.title;
+     form.projectType.value = p.projectType || 'Web';
      form.description.value = p.description;
      form.techStack.value = (p.techStack || []).join(', ');
      form.githubUrl.value = p.githubUrl || '';
@@ -763,6 +765,7 @@ $('#projectForm')?.addEventListener('submit', async e => {
      const form = e.target;
      const body = {
           title: form.title.value,
+          projectType: form.projectType.value,
           description: form.description.value,
           techStack: form.techStack.value.split(',').map(s => s.trim()).filter(Boolean),
           githubUrl: form.githubUrl.value,

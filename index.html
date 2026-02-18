@@ -26,8 +26,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 </head>
 
@@ -45,43 +44,47 @@
 
 
     <aside class="sidebar" data-sidebar>
+      <div class="sidebar-flipper" data-sidebar-flipper>
 
-      <div class="sidebar-info">
+        <!-- FRONT FACE -->
+        <div class="sidebar-front" aria-label="Profile overview">
+          <div class="sidebar-info">
+            <figure class="avatar-box">
+              <img alt="No Avatar" width="80">
+            </figure>
 
-        <figure class="avatar-box">
-          <img alt="No Avatar" width="80">
-        </figure>
+            <div class="info-content">
+              <h1 class="name" title="">Loading...</h1>
+              <p class="title"></p>
+            </div>
 
-        <div class="info-content">
-          <h1 class="name" title="">Loading...</h1>
-
-          <p class="title"></p>
+            <button class="info_more-btn" data-sidebar-btn aria-expanded="false" aria-controls="sidebar-back">
+              <span>Show Contacts</span>
+              <ion-icon name="chevron-forward"></ion-icon>
+            </button>
+          </div>
         </div>
 
-        <button class="info_more-btn" data-sidebar-btn>
-          <span>Show Contacts</span>
+        <!-- BACK FACE -->
+        <div class="sidebar-back" id="sidebar-back" aria-label="Contact details">
 
-          <ion-icon name="chevron-down"></ion-icon>
-        </button>
+          <ul class="contacts-list">
+            <!-- Populated dynamically from API -->
+          </ul>
 
-      </div>
+          <div class="separator"></div>
 
-      <div class="sidebar-info_more">
+          <ul class="social-list">
+            <!-- Populated dynamically from API -->
+          </ul>
 
-        <div class="separator"></div>
-
-        <ul class="contacts-list">
-          <!-- Populated dynamically from API -->
-        </ul>
-
-        <div class="separator"></div>
-
-        <ul class="social-list">
-          <!-- Populated dynamically from API -->
-        </ul>
+          <button class="sidebar-back-btn" data-sidebar-back-btn aria-label="Close contacts">
+            <ion-icon name="arrow-back"></ion-icon>
+            <span>Switch Back</span>
+          </button>
+        </div>
 
       </div>
-
     </aside>
 
 
@@ -211,11 +214,10 @@
             style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap">
             <div class="filter-select-box" data-select>
               <button class="filter-select" aria-haspopup="listbox">
-                <span data-select-value>All</span>
+                <span data-select-value>Web</span>
                 <ion-icon name="chevron-down-outline"></ion-icon>
               </button>
               <ul class="select-list" role="listbox">
-                <li class="select-item" data-select-item="all"><button>All</button></li>
                 <li class="select-item" data-select-item="web"><button>Web</button></li>
                 <li class="select-item" data-select-item="mobile"><button>Mobile</button></li>
                 <li class="select-item" data-select-item="design"><button>Design</button></li>
@@ -224,8 +226,7 @@
             </div>
 
             <ul class="filter-list" aria-label="project filters">
-              <li><button class="filter-btn active" data-filter-btn="all">All</button></li>
-              <li><button class="filter-btn" data-filter-btn="web">Web</button></li>
+              <li><button class="filter-btn active" data-filter-btn="web">Web</button></li>
               <li><button class="filter-btn" data-filter-btn="mobile">Mobile</button></li>
               <li><button class="filter-btn" data-filter-btn="design">Design</button></li>
               <li><button class="filter-btn" data-filter-btn="uiux">UI/UX</button></li>
