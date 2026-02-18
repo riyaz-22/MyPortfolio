@@ -2746,6 +2746,7 @@ textarea.form-input {
 
 /* Touch-friendly adjustments for all mobile devices */
 @media (hover: none) and (pointer: coarse) {
+
   .btn,
   .form-input,
   .navbar-link,

@@ -1772,6 +1772,7 @@ a:hover {
 
 /* Touch-friendly adjustments for all mobile devices */
 @media (hover: none) and (pointer: coarse) {
+
      .btn,
      .input-group input,
      .input-group textarea,
@@ -1842,7 +1843,8 @@ a:hover {
 }
 
 /* Retina display optimizations */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
      body {
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
@@ -1859,6 +1861,7 @@ a:hover {
 
 /* Print optimization */
 @media print {
+
      .sidebar,
      .topbar,
      .btn,

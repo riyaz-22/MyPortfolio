@@ -417,17 +417,17 @@ if ('IntersectionObserver' in window) {
 (() => {
   const root = document.documentElement;
   const applySafeArea = () => {
-    const topPadding = CSS.supports('padding: max(0px)') 
-      ? 'max(1rem, env(safe-area-inset-top))' 
+    const topPadding = CSS.supports('padding: max(0px)')
+      ? 'max(1rem, env(safe-area-inset-top))'
       : '1rem';
-    const bottomPadding = CSS.supports('padding: max(0px)') 
-      ? 'max(1rem, env(safe-area-inset-bottom))' 
+    const bottomPadding = CSS.supports('padding: max(0px)')
+      ? 'max(1rem, env(safe-area-inset-bottom))'
       : '1rem';
-    
+
     root.style.setProperty('--safe-area-top', `env(safe-area-inset-top, 0px)`);
     root.style.setProperty('--safe-area-bottom', `env(safe-area-inset-bottom, 0px)`);
   };
-  
+
   applySafeArea();
   window.addEventListener('orientationchange', applySafeArea);
 })();
@@ -446,7 +446,7 @@ if ('IntersectionObserver' in window) {
       });
     }, 250);
   };
-  
+
   window.addEventListener('resize', handleResize, { passive: true });
   window.addEventListener('orientationchange', handleResize, { passive: true });
 })();
@@ -463,14 +463,14 @@ if ('IntersectionObserver' in window) {
 
   if (isTouchDevice()) {
     document.documentElement.classList.add('is-touch-device');
-    
+
     // Add touch feedback to interactive elements
     const interactiveElements = document.querySelectorAll('a, button, [onclick], .clickable');
     interactiveElements.forEach(el => {
       el.addEventListener('touchstart', () => {
         el.style.opacity = '0.7';
       }, { passive: true });
-      
+
       el.addEventListener('touchend', () => {
         el.style.opacity = '1';
       }, { passive: true });
@@ -512,7 +512,7 @@ if ('IntersectionObserver' in window) {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     const dpr = window.devicePixelRatio || 1;
-    
+
     let category = 'unknown';
     if (vw < 375) category = 'extra-small';
     else if (vw < 425) category = 'small';
@@ -521,17 +521,17 @@ if ('IntersectionObserver' in window) {
     else if (vw < 1024) category = 'small-desktop';
     else if (vw < 1440) category = 'desktop';
     else category = 'large-desktop';
-    
+
     return { vw, vh, dpr, category };
   };
-  
+
   window.getResponsiveInfo = getViewportInfo;
 })();
 
 // Handle viewport scale changes
 (() => {
   let lastScale = window.visualViewport?.scale || 1;
-  
+
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
       const currentScale = window.visualViewport.scale;
@@ -562,7 +562,7 @@ if ('IntersectionObserver' in window) {
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
         if (href === '#') return;
-        
+
         const target = document.querySelector(href);
         if (target) {
           e.preventDefault();
@@ -576,13 +576,13 @@ if ('IntersectionObserver' in window) {
 // Detect reduced motion preference
 (() => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  
+
   if (prefersReducedMotion.matches) {
     document.documentElement.style.setProperty('--duration-fast', '0ms');
     document.documentElement.style.setProperty('--duration-base', '0ms');
     document.documentElement.style.setProperty('--duration-slow', '0ms');
   }
-  
+
   prefersReducedMotion.addEventListener('change', (e) => {
     if (e.matches) {
       document.documentElement.style.setProperty('--duration-fast', '0ms');
