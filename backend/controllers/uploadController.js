@@ -41,33 +41,93 @@ exports.uploadFile = asyncHandler(async (req, res) => {
      }, 'File uploaded successfully');
 });
 
-// ── Upload resume and save to assets/images folder (overwrites existing resume) ──
+// ── Upload resume to GridFS (production-safe; no filesystem writes) ──
 exports.uploadResume = asyncHandler(async (req, res) => {
      if (!req.file) throw new ApiError(400, 'No file uploaded');
-     const assetsDir = path.join(__dirname, '..', '..', 'assets', 'images');
-     if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
 
-     const ext = path.extname(req.file.originalname) || '.pdf';
-     const filename = `resume${ext}`;
-     const filePath = path.join(assetsDir, filename);
+     const db = mongoose.connection.db;
+     const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: 'uploads' });
 
-     await fs.promises.writeFile(filePath, req.file.buffer);
+     const ext = path.extname(req.file.originalname) || '';
+     const filename = `resume-${Date.now()}${ext}`;
+
+     const uploadStream = bucket.openUploadStream(filename, {
+          contentType: req.file.mimetype,
+          metadata: {
+               kind: 'resume',
+               originalName: req.file.originalname,
+          },
+     });
+
+     await new Promise((resolve, reject) => {
+          uploadStream.on('error', reject);
+          uploadStream.on('finish', resolve);
+          uploadStream.end(req.file.buffer);
+     });
+
+     const fileId = uploadStream.id;
+
+     // Keep only one active resume file by removing older resume uploads.
+     const oldResumes = await db.collection('uploads.files')
+          .find({ 'metadata.kind': 'resume', _id: { $ne: fileId } })
+          .project({ _id: 1 })
+          .toArray();
+     await Promise.all(oldResumes.map(async (f) => {
+          try { await bucket.delete(f._id); } catch (_) { }
+     }));
 
      const origin = (req && req.protocol && req.get && req.get('host'))
           ? `${req.protocol}://${req.get('host')}`
           : '';
-     const fileUrl = origin ? `${origin}/assets/images/${filename}` : `/assets/images/${filename}`;
+     const fileUrl = origin ? `${origin}/api/uploads/file/${fileId}` : `/api/uploads/file/${fileId}`;
 
      sendResponse(res, 200, {
+          fileId: fileId.toString(),
           originalName: req.file.originalname,
+          filename,
           fileUrl,
           size: req.file.size,
           mimetype: req.file.mimetype,
      }, 'Resume uploaded successfully');
 });
 
-// ── Return resume info (public URL) if present ─────────────────────────────────
+// ── Return resume info (GridFS primary, filesystem legacy fallback) ───────────
 exports.getResumeInfo = asyncHandler(async (req, res) => {
+     const db = mongoose.connection.db;
+     let latestResume = await db.collection('uploads.files')
+          .find({ 'metadata.kind': 'resume' })
+          .sort({ uploadDate: -1 })
+          .limit(1)
+          .toArray();
+
+     // Compatibility fallback for older uploads without metadata.kind
+     if (!latestResume.length) {
+          latestResume = await db.collection('uploads.files')
+               .find({ filename: { $regex: /^resume/i } })
+               .sort({ uploadDate: -1 })
+               .limit(1)
+               .toArray();
+     }
+
+     if (latestResume.length) {
+          const fileDoc = latestResume[0];
+          const origin = (req && req.protocol && req.get && req.get('host'))
+               ? `${req.protocol}://${req.get('host')}`
+               : '';
+          const fileUrl = origin ? `${origin}/api/uploads/file/${fileDoc._id}` : `/api/uploads/file/${fileDoc._id}`;
+
+          sendResponse(res, 200, {
+               fileId: fileDoc._id.toString(),
+               fileUrl,
+               filename: fileDoc.metadata?.originalName || fileDoc.filename,
+               originalName: fileDoc.metadata?.originalName || fileDoc.filename,
+               mimetype: fileDoc.contentType,
+               size: fileDoc.length,
+          }, 'Resume available');
+          return;
+     }
+
+     // Legacy fallback for local/dev projects that still keep resume under assets/images.
      const assetsDir = path.join(__dirname, '..', '..', 'assets', 'images');
      if (!fs.existsSync(assetsDir)) {
           sendResponse(res, 404, null, 'Resume not found');
@@ -87,7 +147,7 @@ exports.getResumeInfo = asyncHandler(async (req, res) => {
           : '';
      const fileUrl = origin ? `${origin}/assets/images/${candidate}` : `/assets/images/${candidate}`;
 
-     sendResponse(res, 200, { fileUrl, filename: candidate }, 'Resume available');
+     sendResponse(res, 200, { fileUrl, filename: candidate, originalName: candidate }, 'Resume available');
 });
 
 // ── Upload multiple files (stream each to GridFS) ────────────────
