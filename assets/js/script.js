@@ -407,4 +407,193 @@ if ('IntersectionObserver' in window) {
   update();
 })();
 
+/**
+ * ========================================
+ * RESPONSIVE ENHANCEMENTS
+ * ========================================
+ */
+
+// Handle safe area padding for notched devices
+(() => {
+  const root = document.documentElement;
+  const applySafeArea = () => {
+    const topPadding = CSS.supports('padding: max(0px)') 
+      ? 'max(1rem, env(safe-area-inset-top))' 
+      : '1rem';
+    const bottomPadding = CSS.supports('padding: max(0px)') 
+      ? 'max(1rem, env(safe-area-inset-bottom))' 
+      : '1rem';
+    
+    root.style.setProperty('--safe-area-top', `env(safe-area-inset-top, 0px)`);
+    root.style.setProperty('--safe-area-bottom', `env(safe-area-inset-bottom, 0px)`);
+  };
+  
+  applySafeArea();
+  window.addEventListener('orientationchange', applySafeArea);
+})();
+
+// Optimize layout for viewport changes
+(() => {
+  let resizeTimer;
+  const handleResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      // Recalculate layout-sensitive elements
+      const navbarLinks = document.querySelectorAll('.navbar-link');
+      navbarLinks.forEach(link => {
+        // Ensure proper sizing on orientation change
+        link.style.minHeight = window.innerWidth < 600 ? '44px' : 'auto';
+      });
+    }, 250);
+  };
+  
+  window.addEventListener('resize', handleResize, { passive: true });
+  window.addEventListener('orientationchange', handleResize, { passive: true });
+})();
+
+// Touch-friendly enhancements
+(() => {
+  const isTouchDevice = () => {
+    return (
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (navigator.msMaxTouchPoints > 0)
+    );
+  };
+
+  if (isTouchDevice()) {
+    document.documentElement.classList.add('is-touch-device');
+    
+    // Add touch feedback to interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, [onclick], .clickable');
+    interactiveElements.forEach(el => {
+      el.addEventListener('touchstart', () => {
+        el.style.opacity = '0.7';
+      }, { passive: true });
+      
+      el.addEventListener('touchend', () => {
+        el.style.opacity = '1';
+      }, { passive: true });
+    });
+  }
+})();
+
+// Responsive image loading optimization
+(() => {
+  const observerOptions = {
+    root: null,
+    rootMargin: '50px',
+    threshold: 0.01
+  };
+
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+            imageObserver.unobserve(img);
+          }
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      imageObserver.observe(img);
+    });
+  }
+})();
+
+// Viewport metadata debugging (comment out in production)
+(() => {
+  const getViewportInfo = () => {
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const dpr = window.devicePixelRatio || 1;
+    
+    let category = 'unknown';
+    if (vw < 375) category = 'extra-small';
+    else if (vw < 425) category = 'small';
+    else if (vw < 600) category = 'medium';
+    else if (vw < 900) category = 'tablet';
+    else if (vw < 1024) category = 'small-desktop';
+    else if (vw < 1440) category = 'desktop';
+    else category = 'large-desktop';
+    
+    return { vw, vh, dpr, category };
+  };
+  
+  window.getResponsiveInfo = getViewportInfo;
+})();
+
+// Handle viewport scale changes
+(() => {
+  let lastScale = window.visualViewport?.scale || 1;
+  
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const currentScale = window.visualViewport.scale;
+      if (Math.abs(currentScale - lastScale) > 0.1) {
+        lastScale = currentScale;
+        window.dispatchEvent(new Event('viewport-zoom-change'));
+      }
+    }, { passive: true });
+  }
+})();
+
+// Optimize form inputs for mobile
+(() => {
+  const formInputs = document.querySelectorAll('input[type], textarea, select');
+  formInputs.forEach(input => {
+    // Prevent zoom on input focus for iOS
+    input.addEventListener('focus', () => {
+      // Already handled by font-size: 16px in CSS
+      input.style.fontSize = '16px';
+    });
+  });
+})();
+
+// Smooth scroll behavior for anchor links
+(() => {
+  if ('scrollBehavior' in document.documentElement.style) {
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href === '#') return;
+        
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
+})();
+
+// Detect reduced motion preference
+(() => {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  
+  if (prefersReducedMotion.matches) {
+    document.documentElement.style.setProperty('--duration-fast', '0ms');
+    document.documentElement.style.setProperty('--duration-base', '0ms');
+    document.documentElement.style.setProperty('--duration-slow', '0ms');
+  }
+  
+  prefersReducedMotion.addEventListener('change', (e) => {
+    if (e.matches) {
+      document.documentElement.style.setProperty('--duration-fast', '0ms');
+      document.documentElement.style.setProperty('--duration-base', '0ms');
+      document.documentElement.style.setProperty('--duration-slow', '0ms');
+    } else {
+      document.documentElement.style.removeProperty('--duration-fast');
+      document.documentElement.style.removeProperty('--duration-base');
+      document.documentElement.style.removeProperty('--duration-slow');
+    }
+  });
+})();
+
 console.log('Portfolio scripts loaded successfully!');
