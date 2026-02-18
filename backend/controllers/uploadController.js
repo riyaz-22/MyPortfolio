@@ -7,6 +7,25 @@ const sendResponse = require('../utils/sendResponse');
 // ── Upload single file (image / resume) — store in GridFS ─────────
 const mongoose = require('mongoose');
 
+async function findLatestResumeFileDoc(db) {
+     let latestResume = await db.collection('uploads.files')
+          .find({ 'metadata.kind': 'resume' })
+          .sort({ uploadDate: -1 })
+          .limit(1)
+          .toArray();
+
+     // Compatibility fallback for older uploads without metadata.kind
+     if (!latestResume.length) {
+          latestResume = await db.collection('uploads.files')
+               .find({ filename: { $regex: /^resume/i } })
+               .sort({ uploadDate: -1 })
+               .limit(1)
+               .toArray();
+     }
+
+     return latestResume[0] || null;
+}
+
 exports.uploadFile = asyncHandler(async (req, res) => {
      if (!req.file) throw new ApiError(400, 'No file uploaded');
 
@@ -83,6 +102,7 @@ exports.uploadResume = asyncHandler(async (req, res) => {
           : '';
      const fileUrl = origin ? `${origin}/api/uploads/file/${fileId}` : `/api/uploads/file/${fileId}`;
      const downloadUrl = `${fileUrl}?download=1`;
+     const resumeDownloadUrl = origin ? `${origin}/api/uploads/resume/download` : '/api/uploads/resume/download';
 
      sendResponse(res, 200, {
           fileId: fileId.toString(),
@@ -90,6 +110,7 @@ exports.uploadResume = asyncHandler(async (req, res) => {
           filename,
           fileUrl,
           downloadUrl,
+          resumeDownloadUrl,
           size: req.file.size,
           mimetype: req.file.mimetype,
      }, 'Resume uploaded successfully');
@@ -98,33 +119,22 @@ exports.uploadResume = asyncHandler(async (req, res) => {
 // ── Return resume info (GridFS primary, filesystem legacy fallback) ───────────
 exports.getResumeInfo = asyncHandler(async (req, res) => {
      const db = mongoose.connection.db;
-     let latestResume = await db.collection('uploads.files')
-          .find({ 'metadata.kind': 'resume' })
-          .sort({ uploadDate: -1 })
-          .limit(1)
-          .toArray();
+     const latestResume = await findLatestResumeFileDoc(db);
 
-     // Compatibility fallback for older uploads without metadata.kind
-     if (!latestResume.length) {
-          latestResume = await db.collection('uploads.files')
-               .find({ filename: { $regex: /^resume/i } })
-               .sort({ uploadDate: -1 })
-               .limit(1)
-               .toArray();
-     }
-
-     if (latestResume.length) {
-          const fileDoc = latestResume[0];
+     if (latestResume) {
+          const fileDoc = latestResume;
           const origin = (req && req.protocol && req.get && req.get('host'))
                ? `${req.protocol}://${req.get('host')}`
                : '';
           const fileUrl = origin ? `${origin}/api/uploads/file/${fileDoc._id}` : `/api/uploads/file/${fileDoc._id}`;
           const downloadUrl = `${fileUrl}?download=1`;
+          const resumeDownloadUrl = origin ? `${origin}/api/uploads/resume/download` : '/api/uploads/resume/download';
 
           sendResponse(res, 200, {
                fileId: fileDoc._id.toString(),
                fileUrl,
                downloadUrl,
+               resumeDownloadUrl,
                filename: fileDoc.metadata?.originalName || fileDoc.filename,
                originalName: fileDoc.metadata?.originalName || fileDoc.filename,
                mimetype: fileDoc.contentType,
@@ -205,6 +215,9 @@ exports.getFileById = asyncHandler(async (req, res) => {
      // Set Content-Type if available
      if (fileDoc.contentType) res.setHeader('Content-Type', fileDoc.contentType);
      else res.setHeader('Content-Type', 'application/octet-stream');
+     if (typeof fileDoc.length === 'number') res.setHeader('Content-Length', String(fileDoc.length));
+     res.setHeader('X-Content-Type-Options', 'nosniff');
+     res.setHeader('Cache-Control', 'private, no-transform');
 
      const wantsDownload = ['1', 'true', 'yes'].includes(String(req.query.download || '').toLowerCase());
      const preferredName = fileDoc.metadata?.originalName || fileDoc.filename || 'file';
@@ -213,7 +226,7 @@ exports.getFileById = asyncHandler(async (req, res) => {
      if (wantsDownload) {
           res.setHeader('Content-Disposition', `attachment; filename="${asciiName}"; filename*=UTF-8''${encodedName}`);
      } else {
-          res.setHeader('Content-Disposition', 'inline');
+          res.setHeader('Content-Disposition', `inline; filename="${asciiName}"; filename*=UTF-8''${encodedName}`);
      }
 
      const downloadStream = bucket.openDownloadStream(_id);
@@ -221,6 +234,31 @@ exports.getFileById = asyncHandler(async (req, res) => {
 
      // Removed download analytics logging for resume/file downloads
 
+     downloadStream.pipe(res);
+});
+
+// ── Download latest resume with stable endpoint ───────────────────
+exports.downloadLatestResume = asyncHandler(async (req, res) => {
+     const db = mongoose.connection.db;
+     const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: 'uploads' });
+
+     const fileDoc = await findLatestResumeFileDoc(db);
+     if (!fileDoc) throw new ApiError(404, 'Resume not found');
+
+     const preferredName = fileDoc.metadata?.originalName || fileDoc.filename || 'resume.pdf';
+     const asciiName = preferredName.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_');
+     const encodedName = encodeURIComponent(preferredName);
+
+     res.setHeader('Content-Type', fileDoc.contentType || 'application/pdf');
+     if (typeof fileDoc.length === 'number') res.setHeader('Content-Length', String(fileDoc.length));
+     res.setHeader('Content-Disposition', `attachment; filename="${asciiName}"; filename*=UTF-8''${encodedName}`);
+     res.setHeader('X-Content-Type-Options', 'nosniff');
+     res.setHeader('Cache-Control', 'private, no-transform');
+
+     const downloadStream = bucket.openDownloadStream(fileDoc._id);
+     downloadStream.on('error', () => {
+          if (!res.headersSent) res.status(404).json({ success: false, message: 'Resume not found' });
+     });
      downloadStream.pipe(res);
 });
 

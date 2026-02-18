@@ -245,7 +245,7 @@ const PortfolioRenderer = (() => {
           const resumeBtn = document.querySelector('#resumeBtn') || document.querySelector('.hero-cta .btn-secondary');
           if (resume?.fileUrl) {
                if (resumeBtn) {
-                    const downloadUrl = resume.downloadUrl || `${resume.fileUrl}${resume.fileUrl.includes('?') ? '&' : '?'}download=1`;
+                    const downloadUrl = resume.resumeDownloadUrl || resume.downloadUrl || '/api/uploads/resume/download';
                     resumeBtn.setAttribute('href', resolveUrl(downloadUrl));
                     resumeBtn.setAttribute('download', '');
                     resumeBtn.style.display = '';

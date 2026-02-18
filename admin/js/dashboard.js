@@ -316,8 +316,8 @@ async function loadResume() {
           const res = await Api.getResume();
           const info = res.data || {};
           if (info.fileUrl) {
-               const viewUrl = info.fileUrl;
-               const downloadUrl = info.downloadUrl || `${info.fileUrl}${info.fileUrl.includes('?') ? '&' : '?'}download=1`;
+               const viewUrl = resolveUrl(info.fileUrl);
+               const downloadUrl = resolveUrl(info.resumeDownloadUrl || info.downloadUrl || '/api/uploads/resume/download');
                current.innerHTML = `
                     <p>Current resume: <strong>${info.filename || info.fileUrl.split('/').pop()}</strong></p>
                     <div style="margin-top:.5rem">
@@ -345,8 +345,8 @@ $('#resumeFile')?.addEventListener('change', async e => {
           const current = $('#currentResume');
           if (current) current.innerHTML = '<p style="color:var(--text-secondary);font-size:.9rem">Uploading...</p>';
           const res = await Api.uploadResume(file);
-          const viewUrl = res.data.fileUrl;
-          const downloadUrl = res.data.downloadUrl || `${res.data.fileUrl}${res.data.fileUrl.includes('?') ? '&' : '?'}download=1`;
+          const viewUrl = resolveUrl(res.data.fileUrl);
+          const downloadUrl = resolveUrl(res.data.resumeDownloadUrl || '/api/uploads/resume/download');
           toast('Resume uploaded');
           // Refresh display
           portfolio = portfolio; // keep existing cache unchanged

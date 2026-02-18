@@ -11,6 +11,7 @@ router.get('/file/:id', ctrl.getFileById);
 // Resume management (stored in GridFS; legacy assets/images read fallback)
 router.post('/resume', protect, upload.single('file'), ctrl.uploadResume);
 router.get('/resume', ctrl.getResumeInfo);
+router.get('/resume/download', ctrl.downloadLatestResume);
 // Delete by id or filename (protected)
 router.delete('/:filename', protect, ctrl.deleteFile);
 
