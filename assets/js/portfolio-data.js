@@ -572,6 +572,49 @@ const PortfolioRenderer = (() => {
           });
      }
 
+     // ─── Generate Google Maps embed URL from location ───────────────
+     function generateMapsUrl(location) {
+          if (!location) return null;
+          try {
+               // Encode location string for URL
+               const encodedLocation = encodeURIComponent(location.trim());
+               // Generate Google Maps embed URL with the location
+               const mapsUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s${encodedLocation}!2s${encodedLocation}!5e0!3m2!1sen!2sus!4v${Date.now()}`;
+               return mapsUrl;
+          } catch (e) {
+               console.error('[PortfolioData] Error generating maps URL:', e.message);
+               return null;
+          }
+     }
+
+     // ─── Update map based on location ─────────────────────────────
+     function updateContactMap(location) {
+          if (!location) {
+               console.warn('[PortfolioData] No location provided for map update');
+               return;
+          }
+
+          const mapbox = document.querySelector('.mapbox');
+          const iframe = mapbox?.querySelector('iframe');
+
+          if (!iframe) {
+               console.warn('[PortfolioData] Mapbox iframe not found');
+               return;
+          }
+
+          try {
+               const mapsUrl = generateMapsUrl(location);
+               if (mapsUrl) {
+                    iframe.src = mapsUrl;
+                    iframe.title = `${location} map`;
+                    mapbox.setAttribute('aria-label', `${location} location map`);
+                    console.log(`[PortfolioData] Map updated for location: ${location}`);
+               }
+          } catch (e) {
+               console.error('[PortfolioData] Failed to update map:', e.message);
+          }
+     }
+
      // ═══════════════════════════════════════════════════════════════
      //  RENDER: Contact Info
      // ═══════════════════════════════════════════════════════════════
@@ -613,6 +656,8 @@ const PortfolioRenderer = (() => {
             <address class="contact-link">${pd.location}</address>
           </div>
         </li>`;
+               // Update the map with the location
+               updateContactMap(pd.location);
           }
 
           if (html) contactItemList.innerHTML = html;
@@ -851,7 +896,7 @@ const PortfolioRenderer = (() => {
           init();
      }
 
-     return { init, refreshPortfolio };
+     return { init, refreshPortfolio, updateContactMap };
 })();
 
 // Make refresh available globally: type window.refreshPortfolioData() in browser console
@@ -860,5 +905,14 @@ window.refreshPortfolioData = async () => {
           await PortfolioRenderer.refreshPortfolio();
      } else {
           console.error('[PortfolioData] Refresh function not available');
+     }
+};
+
+// Expose map update function globally for manual updates
+window.updatePortfolioMap = (location) => {
+     if (typeof PortfolioRenderer !== 'undefined' && PortfolioRenderer.updateContactMap) {
+          PortfolioRenderer.updateContactMap(location);
+     } else {
+          console.error('[PortfolioData] updateContactMap function not available');
      }
 };
