@@ -1427,12 +1427,26 @@ header {
   object-fit: contain;
 }
 
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xl);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  list-style: none;
+  padding: 0;
+}
+
 .skill-item {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg) 0;
-  border-bottom: 1px solid var(--border-color);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: 0;
+  border-bottom: none;
+  flex: 1;
+  min-width: 200px;
 }
 
 .skill-item:last-child {
@@ -1443,13 +1457,17 @@ header {
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
   font-size: var(--fs-small);
+  min-width: 100px;
+  white-space: nowrap;
 }
 
 .skill-progress {
-  height: 4px;
+  height: 6px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-full);
   overflow: hidden;
+  flex: 1;
+  min-width: 100px;
 }
 
 
@@ -1539,6 +1557,20 @@ header {
 
   .filter-select-box {
     display: block;
+  }
+
+  .skills-list {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .skill-item {
+    flex-direction: column;
+    min-width: auto;
+  }
+
+  .skill-label {
+    min-width: auto;
   }
 }
 
