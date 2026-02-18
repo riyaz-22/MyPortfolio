@@ -38,6 +38,9 @@ const sidebarBackBtn = document.querySelector('[data-sidebar-back-btn]');
 function flipSidebar(show) {
   if (!sidebar) return;
   const flipped = typeof show === 'boolean' ? show : !sidebar.classList.contains('flipped');
+  sidebar.classList.remove('splash-anim');
+  void sidebar.offsetWidth;
+  sidebar.classList.add('splash-anim');
   sidebar.classList.toggle('flipped', flipped);
 
   // ARIA: tell assistive tech which face is visible
@@ -51,6 +54,7 @@ function flipSidebar(show) {
     } else {
       sidebarBtn?.focus();
     }
+    sidebar.classList.remove('splash-anim');
     flipper?.removeEventListener('transitionend', onEnd);
   };
   flipper?.addEventListener('transitionend', onEnd);
@@ -65,61 +69,79 @@ sidebarBackBtn?.addEventListener('click', () => flipSidebar(false));
  * ========================================
  */
 
-const navigationLinks = document.querySelectorAll('[data-nav-link]');
-const pages = document.querySelectorAll('[data-page]');
+const navbarLinks = Array.from(document.querySelectorAll('.navbar [data-nav-link]'));
+const pages = Array.from(document.querySelectorAll('[data-page]'));
+const navbar = document.querySelector('.navbar');
 
-navigationLinks.forEach((link) => {
+const pageMap = {
+  'about': 'about',
+  'experience': 'experience',
+  'portfolio': 'portfolio',
+  'contact': 'contact'
+};
+let suppressScrollSpyUntil = 0;
+
+function getNavTarget(link) {
+  const key = (link.textContent || '').trim().toLowerCase();
+  return pageMap[key] || key;
+}
+
+navbarLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
-    const targetPage = link.textContent.toLowerCase();
-
-    // Handle "Get In Touch" / Contact - activate + SCROLL so banner becomes visible
-    const txt = link.textContent.trim();
-    if (txt === 'Get In Touch' || txt === 'Contact') {
-      // scrollToSection activates the contact page AND scrolls it into view
-      scrollToSection('contact');
-    } else {
-      // Map page names
-      const pageMap = {
-        'about': 'about',
-        'experience': 'experience',
-        'portfolio': 'portfolio',
-        'contact': 'contact'
-      };
-
-      const actualPage = pageMap[targetPage] || targetPage;
-      const targetElement = document.querySelector(`[data-page="${actualPage}"]`);
-
-      if (targetElement) {
-        activatePage(targetElement, actualPage);
-      }
-    }
+    e.preventDefault();
+    const pageName = getNavTarget(link);
+    const targetElement = document.querySelector(`[data-page="${pageName}"]`);
+    if (targetElement) activatePage(targetElement, pageName);
   });
 });
 
+/**
+ * ========================================
+ * NAVBAR SCROLL BEHAVIOR
+ * ========================================
+ */
+
+(() => {
+  if (!navbar) return;
+
+  let lastY = window.scrollY || 0;
+  let ticking = false;
+
+  const updateNavbarOnScroll = () => {
+    const y = window.scrollY || 0;
+
+    navbar.classList.toggle('navbar-scrolled', y > 8);
+    navbar.classList.remove('navbar-hidden');
+
+    lastY = y;
+    ticking = false;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(updateNavbarOnScroll);
+  }, { passive: true });
+})();
+
 function activatePage(pageElement, pageName) {
+  // Prevent scrollspy from briefly overriding click-driven active state.
+  suppressScrollSpyUntil = performance.now() + 450;
+
   // Deactivate all pages
   pages.forEach(page => page.classList.remove('active'));
 
-  // Deactivate all nav links
-  navigationLinks.forEach(link => link.classList.remove('active'));
+  // Deactivate all navbar links
+  navbarLinks.forEach(link => link.classList.remove('active'));
 
   // Activate selected page
   pageElement.classList.add('active');
 
   // Activate corresponding nav link
-  const activeLink = document.querySelector(`[data-nav-link]:not([onclick*="scrollToSection"])`);
-  if (activeLink && pageElement.dataset.page === pageName) {
-    const links = Array.from(navigationLinks).filter(
-      link => !link.getAttribute('onclick')
-    );
-    links.forEach(link => {
-      if (link.textContent.toLowerCase() === pageName) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
-  }
+  const normalizedPage = String(pageName || pageElement.dataset.page || '').toLowerCase();
+  navbarLinks.forEach(link => {
+    link.classList.toggle('active', getNavTarget(link) === normalizedPage);
+  });
 
   // Scroll the selected section into view (smooth)
   pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -327,31 +349,62 @@ if ('IntersectionObserver' in window) {
  * ========================================
  */
 
-// Use IntersectionObserver to toggle `.active` on navbar links as sections enter viewport
+// Keep navbar highlight synced with the section currently in view.
 (() => {
-  const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+  const navLinks = navbarLinks;
   const sections = Array.from(document.querySelectorAll('[data-page]'));
-  if (!navLinks.length || !sections.length || !('IntersectionObserver' in window)) return;
+  if (!navLinks.length || !sections.length) return;
 
-  const spyOptions = {
-    root: null,
-    threshold: 0.5,
-    rootMargin: '0px 0px -10% 0px'
-  };
+  let ticking = false;
 
-  const spyObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.dataset.page && entry.target.dataset.page.toLowerCase();
-        navLinks.forEach(link => {
-          const txt = link.textContent.trim().toLowerCase();
-          link.classList.toggle('active', txt === id);
-        });
+  function setActiveNav(id) {
+    if (!id) return;
+    navLinks.forEach(link => {
+      link.classList.toggle('active', getNavTarget(link) === id);
+    });
+  }
+
+  function getCurrentSectionId() {
+    const visibleSections = sections.filter((s) => getComputedStyle(s).display !== 'none');
+    if (!visibleSections.length) return '';
+
+    // Use an anchor line near the top content area (below fixed navbar).
+    const anchorY = Math.max(120, window.innerHeight * 0.28);
+    let best = visibleSections[0];
+    let bestScore = -Infinity;
+
+    visibleSections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      const intersectsAnchor = rect.top <= anchorY && rect.bottom >= anchorY;
+      const visibleTop = Math.max(rect.top, 0);
+      const visibleBottom = Math.min(rect.bottom, window.innerHeight);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const score = (intersectsAnchor ? 100000 : 0) + visibleHeight;
+      if (score > bestScore) {
+        best = section;
+        bestScore = score;
       }
     });
-  }, spyOptions);
 
-  sections.forEach(s => spyObserver.observe(s));
+    return (best.dataset.page || '').toLowerCase();
+  }
+
+  const update = () => {
+    if (performance.now() >= suppressScrollSpyUntil) {
+      setActiveNav(getCurrentSectionId());
+    }
+    ticking = false;
+  };
+
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
 })();
 
 console.log('Portfolio scripts loaded successfully!');
