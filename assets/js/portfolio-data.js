@@ -74,10 +74,15 @@ const PortfolioRenderer = (() => {
           return 'https://' + u.replace(/^\/+/, '');
      }
 
-     // ─── HTTP helper with enhanced logging ─────────────────────────
+     // ─── HTTP helper with enhanced logging and centralized loader ─────────────────────────
      async function apiFetch(path) {
           try {
                console.log(`[PortfolioData] → Fetching ${path}...`);
+               // Show loader if LoaderManager is available
+               if (typeof LoaderManager !== 'undefined') {
+                    LoaderManager.show(`Fetching ${path.replace(/\//g, ' ').trim()}...`);
+               }
+               
                const res = await fetch(`${API_BASE}${path}`);
                if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
@@ -90,6 +95,11 @@ const PortfolioRenderer = (() => {
           } catch (err) {
                console.error(`[PortfolioData] ✗ Failed to fetch ${path}:`, err.message);
                return null;
+          } finally {
+               // Hide loader if LoaderManager is available
+               if (typeof LoaderManager !== 'undefined') {
+                    LoaderManager.hide();
+               }
           }
      }
 
@@ -124,12 +134,36 @@ const PortfolioRenderer = (() => {
           const titleEl = document.querySelector('.sidebar .title');
           if (titleEl && pd.title) titleEl.textContent = pd.title;
 
-          // Avatar
+          // Avatar — wait for image to load before hiding loader
           if (pd.avatar) {
                const avatarImg = document.querySelector('.sidebar .avatar-box img');
                if (avatarImg) {
-                    avatarImg.src = resolveUrl(pd.avatar);
+                    const avatarUrl = resolveUrl(pd.avatar);
                     avatarImg.alt = `${pd.firstName || ''} ${pd.lastName || ''}`.trim();
+                    
+                    // Show loader if available
+                    if (typeof LoaderManager !== 'undefined') {
+                         LoaderManager.show('Loading avatar...');
+                    }
+                    
+                    // Wait for avatar to load
+                    avatarImg.onload = () => {
+                         console.log('[PortfolioData] ✓ Avatar loaded:', avatarUrl);
+                         if (typeof LoaderManager !== 'undefined') {
+                              LoaderManager.hide();
+                         }
+                    };
+                    
+                    // Handle load error
+                    avatarImg.onerror = () => {
+                         console.warn('[PortfolioData] ⚠ Avatar failed to load:', avatarUrl);
+                         if (typeof LoaderManager !== 'undefined') {
+                              LoaderManager.hide();
+                         }
+                    };
+                    
+                    // Set src to trigger load
+                    avatarImg.src = avatarUrl;
                }
           }
 
@@ -827,58 +861,70 @@ const PortfolioRenderer = (() => {
           console.log('[PortfolioData] Initializing — fetching from MongoDB API...');
           console.log('[PortfolioData] Request timestamp:', new Date().toISOString());
 
-          // Fetch all data in parallel (including resume info)
-          const startTime = performance.now();
-          const [portfolioRes, servicesRes, testimonialsRes, resumeRes] = await Promise.all([
-               apiFetch('/portfolio'),
-               apiFetch('/services'),
-               apiFetch('/testimonials'),
-               apiFetch('/uploads/resume'),
-          ]);
-          const loadTime = performance.now() - startTime;
-          console.log(`[PortfolioData] Data fetched in ${loadTime.toFixed(0)}ms`);
-
-          const portfolio = portfolioRes?.data;
-          const services = servicesRes?.data || [];
-          const testimonials = testimonialsRes?.data || [];
-
-          if (!portfolio) {
-               console.warn('[PortfolioData] ⚠ No portfolio found in MongoDB');
-               console.log('[PortfolioData] Admin URL:', ADMIN_URL);
-               // Show a message in the hero section
-               const heroTitle = document.querySelector('.hero-title');
-               if (heroTitle) heroTitle.innerHTML = 'Welcome to <span class="text-gradient">My</span> Portfolio';
-               const heroSubtitle = document.querySelector('.hero-subtitle');
-               if (heroSubtitle) heroSubtitle.textContent = 'Content is being set up. Please check back soon!';
-               const nameEl = document.querySelector('.sidebar .name');
-               if (nameEl) nameEl.textContent = 'Portfolio';
-               // Still render services if they exist separately
-               if (services.length > 0) renderServices(services);
-               setupContactForm();
-               return;
+          // Show centralized loader for initialization
+          if (typeof LoaderManager !== 'undefined') {
+               LoaderManager.show('Loading portfolio...');
           }
 
-          console.log('[PortfolioData] ✓ Portfolio loaded from MongoDB:', { _id: portfolio._id, personalDetails: !!portfolio.personalDetails });
+          try {
+               // Fetch all data in parallel (including resume info)
+               const startTime = performance.now();
+               const [portfolioRes, servicesRes, testimonialsRes, resumeRes] = await Promise.all([
+                    apiFetch('/portfolio'),
+                    apiFetch('/services'),
+                    apiFetch('/testimonials'),
+                    apiFetch('/uploads/resume'),
+               ]);
+               const loadTime = performance.now() - startTime;
+               console.log(`[PortfolioData] Data fetched in ${loadTime.toFixed(0)}ms`);
 
-          const pd = portfolio.personalDetails || {};
+               const portfolio = portfolioRes?.data;
+               const services = servicesRes?.data || [];
+               const testimonials = testimonialsRes?.data || [];
 
-          // Render all sections
-          renderSidebar(pd);
-          // Prefer resume from the dedicated endpoint; fallback to portfolio.resume
-          const resumeInfo = resumeRes?.data || portfolio.resume || null;
-          renderHero(pd, resumeInfo);
-          renderAbout(pd);
-          renderServices(services);
-          renderSkills(portfolio.skills || []);
-          renderExperience(portfolio.experience || []);
-          renderEducation(portfolio.education || []);
-          renderTechProficiency(portfolio.skills || []);
-          renderProjects(portfolio.projects || []);
-          renderContactInfo(pd);
-          updatePageMeta(pd);
-          setupContactForm();
+               if (!portfolio) {
+                    console.warn('[PortfolioData] ⚠ No portfolio found in MongoDB');
+                    console.log('[PortfolioData] Admin URL:', ADMIN_URL);
+                    // Show a message in the hero section
+                    const heroTitle = document.querySelector('.hero-title');
+                    if (heroTitle) heroTitle.innerHTML = 'Welcome to <span class="text-gradient">My</span> Portfolio';
+                    const heroSubtitle = document.querySelector('.hero-subtitle');
+                    if (heroSubtitle) heroSubtitle.textContent = 'Content is being set up. Please check back soon!';
+                    const nameEl = document.querySelector('.sidebar .name');
+                    if (nameEl) nameEl.textContent = 'Portfolio';
+                    // Still render services if they exist separately
+                    if (services.length > 0) renderServices(services);
+                    setupContactForm();
+                    return;
+               }
 
-          console.log('[PortfolioData] ✓ Portfolio fully rendered.');
+               console.log('[PortfolioData] ✓ Portfolio loaded from MongoDB:', { _id: portfolio._id, personalDetails: !!portfolio.personalDetails });
+
+               const pd = portfolio.personalDetails || {};
+
+               // Render all sections
+               renderSidebar(pd);
+               // Prefer resume from the dedicated endpoint; fallback to portfolio.resume
+               const resumeInfo = resumeRes?.data || portfolio.resume || null;
+               renderHero(pd, resumeInfo);
+               renderAbout(pd);
+               renderServices(services);
+               renderSkills(portfolio.skills || []);
+               renderExperience(portfolio.experience || []);
+               renderEducation(portfolio.education || []);
+               renderTechProficiency(portfolio.skills || []);
+               renderProjects(portfolio.projects || []);
+               renderContactInfo(pd);
+               updatePageMeta(pd);
+               setupContactForm();
+
+               console.log('[PortfolioData] ✓ Portfolio fully rendered.');
+          } finally {
+               // Hide loader after initialization completes
+               if (typeof LoaderManager !== 'undefined') {
+                    LoaderManager.hide();
+               }
+          }
      }
 
      // Refresh function to manually re-sync portfolio data from MongoDB

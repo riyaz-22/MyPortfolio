@@ -66,6 +66,7 @@ const Api = {
           const url = `${API_BASE}${endpoint}`;
           const method = options.method || 'GET';
           const headers = { ...options.headers };
+          const showLoader = options.showLoader !== false; // Default: show loader
 
           if (!(options.body instanceof FormData)) {
                headers['Content-Type'] = 'application/json';
@@ -80,6 +81,11 @@ const Api = {
                try { reqLog.bodyPreview = JSON.stringify(options.body).substring(0, 200); } catch (e) { }
           }
           console.log(`[API] → ${method} ${endpoint}`, reqLog);
+
+          // Show loader if enabled
+          if (showLoader && typeof LoaderManager !== 'undefined') {
+               LoaderManager.show();
+          }
 
           try {
                const res = await fetch(url, {
@@ -123,6 +129,11 @@ const Api = {
                     throw new Error('Cannot reach server. Make sure the backend is running on port 5000.');
                }
                throw err;
+          } finally {
+               // Always hide loader when request completes
+               if (showLoader && typeof LoaderManager !== 'undefined') {
+                    LoaderManager.hide();
+               }
           }
      },
 
